@@ -11,3 +11,12 @@ logs
 .vscode
 .idea
 .DS_Store
+
+# Preserve user data directories
+input/
+fractura_bone/
+*.hdf5
+*.h5
+
+# Laptop-side rsync landing zone (see scripts/remote/fetch_artifacts.sh)
+artifacts/
