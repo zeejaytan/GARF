@@ -23,6 +23,12 @@ class BreakingBadDataModule(L.LightningDataModule):
         multi_ref: bool = False,
         mesh_sample_strategy: Literal["uniform", "poisson"] = "poisson",
         random_anchor: bool = False,
+        rim_oversample_frac: float = 0.0,
+        rim_band_frac: float = 0.05,
+        rim_relief_pct: float = 85.0,
+        frac_erode_prob: float = 0.0,
+        frac_erode_min: float = 0.3,
+        frac_erode_max: float = 1.0,
         additional_data_root: Optional[Dict[str, str]] = None,
     ):
         super().__init__()
@@ -45,7 +51,25 @@ class BreakingBadDataModule(L.LightningDataModule):
         self.mesh_sample_strategy = mesh_sample_strategy
         self.random_anchor = random_anchor
 
+        # Fracture-rim oversampling remedy (0.0 = original sampling behaviour).
+        self.rim_oversample_frac = rim_oversample_frac
+        self.rim_band_frac = rim_band_frac
+        self.rim_relief_pct = rim_relief_pct
+        self.frac_erode_prob = frac_erode_prob
+        self.frac_erode_min = frac_erode_min
+        self.frac_erode_max = frac_erode_max
+
         print("Using mesh sample strategy:", self.mesh_sample_strategy)
+        if self.frac_erode_prob > 0.0:
+            print(
+                f"Worn-break augmentation ON (train): prob={self.frac_erode_prob}, "
+                f"strength in [{self.frac_erode_min}, {self.frac_erode_max}]"
+            )
+        if self.rim_oversample_frac > 0.0:
+            print(
+                f"Fracture-rim oversampling ON: frac={self.rim_oversample_frac}, "
+                f"band_frac={self.rim_band_frac}, relief_pct={self.rim_relief_pct}"
+            )
 
         # If breaking_bad_other_data_root is provided
         self.additional_data_root = additional_data_root
@@ -81,6 +105,12 @@ class BreakingBadDataModule(L.LightningDataModule):
                         multi_ref=self.multi_ref,
                         mesh_sample_strategy=self.mesh_sample_strategy,
                         random_anchor=self.random_anchor,
+                        rim_oversample_frac=self.rim_oversample_frac,
+                        rim_band_frac=self.rim_band_frac,
+                        rim_relief_pct=self.rim_relief_pct,
+                        frac_erode_prob=self.frac_erode_prob,
+                        frac_erode_min=self.frac_erode_min,
+                        frac_erode_max=self.frac_erode_max,
                     )
                     for category in self.categories
                 ]
@@ -103,6 +133,9 @@ class BreakingBadDataModule(L.LightningDataModule):
                         min_points_per_part=self.min_points_per_part,
                         mesh_sample_strategy=self.mesh_sample_strategy,
                         random_anchor=self.random_anchor,
+                        rim_oversample_frac=self.rim_oversample_frac,
+                        rim_band_frac=self.rim_band_frac,
+                        rim_relief_pct=self.rim_relief_pct,
                     )
                     for category in self.categories
                 ]
@@ -128,6 +161,9 @@ class BreakingBadDataModule(L.LightningDataModule):
                         num_redundancy=self.num_redundancy,
                         mesh_sample_strategy=self.mesh_sample_strategy,
                         random_anchor=self.random_anchor,
+                        rim_oversample_frac=self.rim_oversample_frac,
+                        rim_band_frac=self.rim_band_frac,
+                        rim_relief_pct=self.rim_relief_pct,
                     )
                     for category in self.categories
                 ]
@@ -148,6 +184,7 @@ class BreakingBadDataModule(L.LightningDataModule):
             batch_size=self.batch_size,
             num_workers=self.num_workers,
             persistent_workers=False,
+            collate_fn=BreakingBadWeighted.collate_fn,
         )
 
     def test_dataloader(self):

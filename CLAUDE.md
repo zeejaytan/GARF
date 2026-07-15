@@ -40,7 +40,7 @@ Key Findings from Previous Sessions
 
 Critical Files
 --------------
-• Session insights: SESSION_INSIGHTS.md (comprehensive analysis)
+• Session insights: docs/notes/SESSION_INSIGHTS.md (comprehensive analysis)
 • HDF5 data: input/breaking_bad_vol.hdf5 (Tray-000 with 40 sherds)
 • Results: logs/GARF/tray_vol_one_step_init/version_9/json_results/0.json
 • Models: output/GARF.ckpt (pre-trained), output/tray_artifact_finetune/ (fine-tuned)

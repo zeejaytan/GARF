@@ -397,8 +397,11 @@ class DenoiserBase(L.LightningModule):
 
         pred_trans = noisy_trans_and_rots[..., :3].detach()  # (valid_P, 3)
         pred_rots = noisy_trans_and_rots[..., 3:].detach()  # (valid_P, 4)
+        deploy_mode = self.inference_config.get("deploy_mode", False)
 
-        if self.inference_config.get("anchor_free", False):
+        # Benchmark only: align free prediction to ref-part scatter GT for metrics.
+        # Deploy must skip this — GT is random aug, not true assembly (see deploy_mode).
+        if self.inference_config.get("anchor_free", False) and not deploy_mode:
             ref_part = data_dict["ref_part"][part_valids]
             ref_part_gt_trans = gt_trans_and_rots[ref_part, :3]
             ref_part_gt_quat = gt_trans_and_rots[ref_part, 3:]
@@ -452,12 +455,16 @@ class DenoiserBase(L.LightningModule):
             torch.cumsum(part_valids, dim=-1) <= num_parts_wo_redundancy[:, None]
         ) & part_valids
 
+        # Archaeological deploy: no true assembly GT — skip benchmark metrics.
+        if deploy_mode:
+            acc = torch.full((B,), float("nan"), device=self.device)
+            rmse_r = torch.full((B,), float("nan"), device=self.device)
+            rmse_t = torch.full((B,), float("nan"), device=self.device)
+            shape_cd = torch.full((B,), float("nan"), device=self.device)
         # Two scenarios: (B, P, N, 3) or (B, N_sum, 3)
         # First one is for uniform sampling, second one is for weighted sampling
         # We have to calculate shape_cd and part_acc differently
-
-        # Uniform sampling
-        if pts.ndim == 4:
+        elif pts.ndim == 4:
             B, P, N, C = pts.shape
             # (B, P, N, 1)
             expanded_part_scale = data_dict["scale"].unsqueeze(-1).expand(-1, -1, N, -1)
@@ -510,12 +517,13 @@ class DenoiserBase(L.LightningModule):
                 part_valids_wo_redundancy=part_valids_wo_redundancy,
             )
 
-        rmse_r = rot_metrics(
-            pred_rots_padded, gt_rots_padded, part_valids_wo_redundancy, "rmse"
-        )
-        rmse_t = trans_metrics(
-            pred_trans_padded, gt_trans_padded, part_valids_wo_redundancy, "rmse"
-        )
+        if not deploy_mode:
+            rmse_r = rot_metrics(
+                pred_rots_padded, gt_rots_padded, part_valids_wo_redundancy, "rmse"
+            )
+            rmse_t = trans_metrics(
+                pred_trans_padded, gt_trans_padded, part_valids_wo_redundancy, "rmse"
+            )
 
         self.acc_list.append(acc)
         self.rmse_r_list.append(rmse_r)
@@ -532,11 +540,7 @@ class DenoiserBase(L.LightningModule):
                 data = {
                     "name": data_dict["name"][b],
                     "num_parts": data_dict["num_parts"][b].detach().item(),
-                    "gt_trans_rots": gt_trans_and_rots[
-                        num_parts_cum[b] : num_parts_cum[b + 1]
-                    ]
-                    .detach()
-                    .tolist(),
+                    "deploy_mode": deploy_mode,
                     "pred_trans_rots": [
                         all_steps_preds[step_idx][
                             num_parts_cum[b] : num_parts_cum[b + 1]
@@ -545,15 +549,32 @@ class DenoiserBase(L.LightningModule):
                         .tolist()
                         for step_idx in range(len(all_steps_preds))
                     ],
-                    "part_acc": acc[b].detach().item(),
-                    "rmse_t": rmse_t[b].detach().item(),
-                    "rmse_r": rmse_r[b].detach().item(),
-                    "shape_cd": shape_cd[b].detach().item(),
                     "removal_pieces": data_dict["removal_pieces"][b],
                     "redundant_pieces": data_dict["redundant_pieces"][b],
                     "pieces": data_dict["pieces"][b],
                     "mesh_scale": data_dict["mesh_scale"][b].detach().item(),
                 }
+                if deploy_mode:
+                    data["note"] = (
+                        "Archaeological deploy inference — no true assembly GT. "
+                        "Ignore part_acc/rmse metrics; inspect predicted_assembly.glb."
+                    )
+                    # Dataloader scatter aug (recenter + random rot), NOT scan assembly.
+                    data["gt_transform"] = (
+                        gt_trans_and_rots[num_parts_cum[b] : num_parts_cum[b + 1]]
+                        .detach()
+                        .tolist()
+                    )
+                else:
+                    data["gt_trans_rots"] = (
+                        gt_trans_and_rots[num_parts_cum[b] : num_parts_cum[b + 1]]
+                        .detach()
+                        .tolist()
+                    )
+                    data["part_acc"] = acc[b].detach().item()
+                    data["rmse_t"] = rmse_t[b].detach().item()
+                    data["rmse_r"] = rmse_r[b].detach().item()
+                    data["shape_cd"] = shape_cd[b].detach().item()
 
                 json.dump(
                     data,
@@ -583,24 +604,6 @@ class DenoiserBase(L.LightningModule):
                 start = num_parts_cum[b].item()
                 end = num_parts_cum[b + 1].item()
 
-                scene_pred = trimesh.Scene()
-                for part_idx, part_mesh in enumerate(data_dict["meshes"][b]):
-                    global_idx = start + part_idx
-                    gt_tf = gt_trans_and_rots[global_idx]
-                    pred_tf = pred_trans_rots[global_idx]
-                    gt_mat = self.se3_to_matrix(gt_tf)
-                    pred_mat = self.se3_to_matrix(pred_tf)
-                    T_final = pred_mat.cpu() @ torch.linalg.inv(gt_mat.cpu())
-                    scene_pred.add_geometry(
-                        part_mesh.copy(), transform=T_final.cpu().numpy()
-                    )
-                scene_pred.export(obj_dir / "view_assembly_0.glb")
-
-                scene_gt = trimesh.Scene()
-                for part_mesh in data_dict["meshes"][b]:
-                    scene_gt.add_geometry(part_mesh)
-                scene_gt.export(obj_dir / "view_gt.glb")
-
                 removal_pieces = (
                     data_dict["removal_pieces"][b]
                     if "removal_pieces" in data_dict
@@ -615,27 +618,84 @@ class DenoiserBase(L.LightningModule):
                     data_dict["pieces"][b] if "pieces" in data_dict else ""
                 )
 
-                assembly_json = {
-                    "part_acc": acc[b].detach().item(),
-                    "rmse_t": rmse_t[b].detach().item(),
-                    "rmse_r": rmse_r[b].detach().item(),
-                    "shape_cd": shape_cd[b].detach().item(),
-                    "num_parts": int(data_dict["num_parts"][b].item()),
-                    "gt_transform": gt_trans_and_rots[start:end]
-                    .detach()
-                    .cpu()
-                    .tolist(),
-                    "pred_transform": pred_trans_rots[start:end]
-                    .detach()
-                    .cpu()
-                    .tolist(),
-                    "removal_pieces": removal_pieces,
-                    "redundant_pieces": redundant_pieces,
-                    "pieces": pieces,
-                    "mesh_scale": data_dict["mesh_scale"][b].detach().item(),
-                }
-                with (obj_dir / "view_assembly_0.json").open("w") as f:
-                    json.dump(assembly_json, f, indent=2)
+                if deploy_mode:
+                    scene_pred = trimesh.Scene()
+                    for part_idx, part_mesh in enumerate(data_dict["meshes"][b]):
+                        global_idx = start + part_idx
+                        gt_tf = gt_trans_and_rots[global_idx]
+                        pred_tf = pred_trans_rots[global_idx]
+                        gt_mat = self.se3_to_matrix(gt_tf)
+                        pred_mat = self.se3_to_matrix(pred_tf)
+                        # Same as benchmark: pred relative to per-part scatter aug on mesh.
+                        t_final = pred_mat.cpu() @ torch.linalg.inv(gt_mat.cpu())
+                        scene_pred.add_geometry(
+                            part_mesh.copy(), transform=t_final.cpu().numpy()
+                        )
+                    scene_pred.export(obj_dir / "predicted_assembly.glb")
+
+                    scene_scan = trimesh.Scene()
+                    for part_mesh in data_dict["meshes"][b]:
+                        scene_scan.add_geometry(part_mesh.copy())
+                    scene_scan.export(obj_dir / "scan_layout.glb")
+
+                    assembly_json = {
+                        "deploy_mode": True,
+                        "note": (
+                            "Predicted assembly from model poses (anchor-free). "
+                            "scan_layout.glb is anchor-centered scan positions only."
+                        ),
+                        "num_parts": int(data_dict["num_parts"][b].item()),
+                        "pred_transform": pred_trans_rots[start:end]
+                        .detach()
+                        .cpu()
+                        .tolist(),
+                        "removal_pieces": removal_pieces,
+                        "redundant_pieces": redundant_pieces,
+                        "pieces": pieces,
+                        "mesh_scale": data_dict["mesh_scale"][b].detach().item(),
+                    }
+                    with (obj_dir / "predicted_assembly.json").open("w") as f:
+                        json.dump(assembly_json, f, indent=2)
+                else:
+                    scene_pred = trimesh.Scene()
+                    for part_idx, part_mesh in enumerate(data_dict["meshes"][b]):
+                        global_idx = start + part_idx
+                        gt_tf = gt_trans_and_rots[global_idx]
+                        pred_tf = pred_trans_rots[global_idx]
+                        gt_mat = self.se3_to_matrix(gt_tf)
+                        pred_mat = self.se3_to_matrix(pred_tf)
+                        T_final = pred_mat.cpu() @ torch.linalg.inv(gt_mat.cpu())
+                        scene_pred.add_geometry(
+                            part_mesh.copy(), transform=T_final.cpu().numpy()
+                        )
+                    scene_pred.export(obj_dir / "view_assembly_0.glb")
+
+                    scene_gt = trimesh.Scene()
+                    for part_mesh in data_dict["meshes"][b]:
+                        scene_gt.add_geometry(part_mesh)
+                    scene_gt.export(obj_dir / "view_gt.glb")
+
+                    assembly_json = {
+                        "part_acc": acc[b].detach().item(),
+                        "rmse_t": rmse_t[b].detach().item(),
+                        "rmse_r": rmse_r[b].detach().item(),
+                        "shape_cd": shape_cd[b].detach().item(),
+                        "num_parts": int(data_dict["num_parts"][b].item()),
+                        "gt_transform": gt_trans_and_rots[start:end]
+                        .detach()
+                        .cpu()
+                        .tolist(),
+                        "pred_transform": pred_trans_rots[start:end]
+                        .detach()
+                        .cpu()
+                        .tolist(),
+                        "removal_pieces": removal_pieces,
+                        "redundant_pieces": redundant_pieces,
+                        "pieces": pieces,
+                        "mesh_scale": data_dict["mesh_scale"][b].detach().item(),
+                    }
+                    with (obj_dir / "view_assembly_0.json").open("w") as f:
+                        json.dump(assembly_json, f, indent=2)
 
     def on_test_epoch_end(self):
         return self.on_validation_epoch_end()

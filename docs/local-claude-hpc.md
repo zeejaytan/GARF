@@ -67,7 +67,7 @@ From the laptop clone:
 
 ```bash
 git add … && git commit && git push
-./scripts/remote/pull_and_sbatch.sh smoke_test.slurm
+./scripts/remote/pull_and_sbatch.sh slurm/smoke_test.slurm
 ./scripts/remote/job_status.sh
 ./scripts/remote/fetch_artifacts.sh logs/some_run ./artifacts/
 ```

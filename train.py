@@ -39,7 +39,11 @@ def main(cfg: DictConfig):
     ]
 
     if cfg.get("ckpt_path") and cfg.get("finetuning"):
-        state_dict = torch.load(cfg.get("ckpt_path"), map_location="cpu")["state_dict"]
+        # weights_only=False: local trusted Lightning checkpoints carry OmegaConf
+        # hyper_parameters, which torch>=2.6's default weights_only=True rejects.
+        state_dict = torch.load(
+            cfg.get("ckpt_path"), map_location="cpu", weights_only=False
+        )["state_dict"]
         model.load_state_dict(state_dict)
         model.enable_lora()
 

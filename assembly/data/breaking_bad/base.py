@@ -1,5 +1,7 @@
 from typing import Literal, List
 
+import random
+
 import trimesh
 import logging
 import h5py
@@ -42,6 +44,12 @@ class BreakingBadBase(Dataset):
         multi_ref: bool = False,
         mesh_sample_strategy: Literal["uniform", "poisson"] = "uniform",
         random_anchor: bool = False,
+        rim_oversample_frac: float = 0.0,
+        rim_band_frac: float = 0.05,
+        rim_relief_pct: float = 85.0,
+        frac_erode_prob: float = 0.0,
+        frac_erode_min: float = 0.3,
+        frac_erode_max: float = 1.0,
     ):
         super().__init__()
         self.split = split
@@ -56,6 +64,31 @@ class BreakingBadBase(Dataset):
         self.multi_ref = multi_ref
         self.mesh_sample_strategy = mesh_sample_strategy
         self.random_anchor = random_anchor
+        # Fracture-rim oversampling (remedy for worn thin-walled artifacts, see
+        # JUGLET_ROOTCAUSE_FINDINGS.md): force `rim_oversample_frac` of each
+        # part's point budget onto the geometrically detected fracture-rim band.
+        # 0.0 disables it and reproduces the original area-weighted sampling.
+        assert 0.0 <= rim_oversample_frac < 1.0, (
+            f"rim_oversample_frac must be in [0, 1), got {rim_oversample_frac}"
+        )
+        self.rim_oversample_frac = rim_oversample_frac
+        self.rim_band_frac = rim_band_frac
+        self.rim_relief_pct = rim_relief_pct
+        # Worn-break augmentation (remedy for the encoder blindness found in Exp 10,
+        # JUGLET_ROOTCAUSE_FINDINGS.md): with probability `frac_erode_prob`, mollify
+        # each training object's true fracture contact band at a random wear strength
+        # in [frac_erode_min, frac_erode_max] before sampling, teaching the frozen
+        # encoder that worn/smoothed breaks are still fracture surfaces. Labels are
+        # preserved. 0.0 disables it (original behaviour).
+        assert 0.0 <= frac_erode_prob <= 1.0, (
+            f"frac_erode_prob must be in [0, 1], got {frac_erode_prob}"
+        )
+        assert 0.0 <= frac_erode_min <= frac_erode_max <= 1.0, (
+            "require 0 <= frac_erode_min <= frac_erode_max <= 1"
+        )
+        self.frac_erode_prob = frac_erode_prob
+        self.frac_erode_min = frac_erode_min
+        self.frac_erode_max = frac_erode_max
         self.data_list = self.get_data_list()
 
         print("Using mesh sample strategy:", self.mesh_sample_strategy)
@@ -144,6 +177,29 @@ class BreakingBadBase(Dataset):
 
         graph = self.get_graph(shared_faces=shared_faces)
 
+        # Worn-break augmentation (Exp 10 remedy): erode the true fracture contact
+        # band at a random wear strength so the encoder learns worn breaks are still
+        # fractures. Train split only; meshes are in the assembled pose here (needed
+        # to locate the mating band); faces/shared_faces are untouched.
+        if (
+            self.split == "train"
+            and self.frac_erode_prob > 0.0
+            and num_parts >= 2
+            and random.random() < self.frac_erode_prob
+        ):
+            from .fracture_erosion import erode_contact_bands
+
+            strength = random.uniform(self.frac_erode_min, self.frac_erode_max)
+            try:
+                eroded = erode_contact_bands(list(meshes), strength)
+                meshes = [
+                    trimesh.Trimesh(vertices=ev, faces=m.faces, process=False)
+                    for m, ev in zip(meshes, eroded)
+                ]
+            except Exception:
+                # Degenerate geometry: fall back to the unmodified meshes.
+                pass
+
         # Removal to simulate missing part
         removal_pieces = []
         if self.num_removal > 0:
@@ -229,6 +285,64 @@ class BreakingBadBase(Dataset):
         shared_faces: List[np.ndarray],
     ) -> List[np.ndarray]:
         raise NotImplementedError
+
+    RIM_RELIEF_RADIUS_FRAC = 0.03  # physical relief radius / piece scale
+    RIM_RELIEF_SAMPLES = 4000      # surface samples for relief estimation
+
+    def rim_face_weights(self, mesh: trimesh.Trimesh) -> np.ndarray:
+        """Area weights restricted to the fracture-rim band of a fragment.
+
+        The band is detected via surface RELIEF at a fixed physical radius
+        (normal variation among surface samples within 3% of piece scale),
+        NOT via mesh dihedral angles: on finely meshed worn rims a rounded
+        fillet has no high-dihedral edges (resolution trap), while its relief
+        at physical scale stays elevated relative to the smooth sherd walls.
+        Sample points whose relief is in the top (100 - rim_relief_pct)
+        percent anchor the band; every face whose centroid lies within
+        ``rim_band_frac`` * piece scale of an anchor belongs to it. No
+        fracture labels are needed (Juglet-style scans lack them).
+
+        Returns per-face weights (face_area inside the band, 0 outside) for
+        ``trimesh.sample.sample_surface``, or ``None`` when no usable band is
+        found (degenerate/featureless meshes) so callers can fall back to
+        plain area-weighted sampling.
+        """
+        from scipy.spatial import cKDTree
+
+        if len(mesh.faces) < 8:
+            return None
+        scale = float(max(mesh.extents))
+        if scale <= 0:
+            return None
+        try:
+            pts, fid = trimesh.sample.sample_surface(mesh, self.RIM_RELIEF_SAMPLES)
+        except Exception:
+            return None
+        pts = np.asarray(pts)
+        normals = mesh.face_normals[fid]
+        radius = self.RIM_RELIEF_RADIUS_FRAC * scale
+        tree = cKDTree(pts)
+        relief = np.zeros(len(pts))
+        for i, neighbors in enumerate(tree.query_ball_point(pts, radius)):
+            if len(neighbors) < 3:
+                continue
+            cos = normals[neighbors] @ normals[i]
+            relief[i] = 1.0 - float(np.clip(cos, -1.0, 1.0).mean())
+        if not np.any(relief > 0):
+            return None
+        anchors = pts[relief >= np.percentile(relief, self.rim_relief_pct)]
+        if len(anchors) == 0:
+            return None
+        band_radius = self.rim_band_frac * scale
+        dist, _ = cKDTree(anchors).query(mesh.triangles_center)
+        band = dist <= band_radius
+        weights = mesh.area_faces * band
+        total = weights.sum()
+        # Guard against degenerate bands (< 1% of surface area): oversampling
+        # a sliver would starve the rest of the fragment of points.
+        if total <= 0 or total < 0.01 * mesh.area:
+            return None
+        return weights
 
     def get_graph(
         self,

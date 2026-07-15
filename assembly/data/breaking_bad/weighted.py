@@ -37,28 +37,55 @@ class BreakingBadWeighted(BreakingBadBase):
         points_per_part[
             np.argmin(points_per_part)
         ] += self.num_points_to_sample - np.sum(points_per_part)
-        sampled_pcds = []
-        if self.mesh_sample_strategy == "poisson":
-            for i in range(len(meshes)):
-                pcd, idx = trimesh.sample.sample_surface_even(
-                    meshes[i], count=points_per_part[i]
-                )
-                if len(pcd) < points_per_part[i]:
+        def sample_body(mesh: trimesh.Trimesh, count: int):
+            """Whole-surface draw with the configured strategy (original behaviour)."""
+            if self.mesh_sample_strategy == "poisson":
+                pcd, idx = trimesh.sample.sample_surface_even(mesh, count=count)
+                if len(pcd) < count:
                     concat_pcd, concat_idx = trimesh.sample.sample_surface(
-                        meshes[i],
-                        count=points_per_part[i] - len(pcd),
+                        mesh, count=count - len(pcd)
                     )
                     pcd = np.concatenate([pcd, concat_pcd], axis=0)
                     idx = np.concatenate([idx, concat_idx], axis=0)
-                sampled_pcds.append((pcd, idx))
-        else:
-            sampled_pcds = [
-                trimesh.sample.sample_surface(
-                    mesh=meshes[i],
-                    count=points_per_part[i],
+                return pcd, idx
+            return trimesh.sample.sample_surface(mesh=mesh, count=count)
+
+        sampled_pcds = []
+        for i in range(len(meshes)):
+            count = points_per_part[i]
+            # Remedy for worn thin-walled artifacts (JUGLET_ROOTCAUSE_FINDINGS.md):
+            # plain surface sampling starves the matchable fracture rim on thin
+            # sherds. Force `rim_oversample_frac` of each part's budget onto the
+            # geometrically detected rim band (area-weighted inside the band);
+            # the remainder uses the configured strategy. Falls back to the
+            # original behaviour per part when no usable band is found.
+            rim_weights = (
+                self.rim_face_weights(meshes[i])
+                if self.rim_oversample_frac > 0.0
+                else None
+            )
+            n_rim = (
+                min(int(round(self.rim_oversample_frac * count)), count)
+                if rim_weights is not None
+                else 0
+            )
+            if n_rim <= 0:
+                sampled_pcds.append(sample_body(meshes[i], count))
+                continue
+            rim_pcd, rim_idx = trimesh.sample.sample_surface(
+                mesh=meshes[i], count=n_rim, face_weight=rim_weights
+            )
+            n_body = count - n_rim
+            if n_body <= 0:
+                sampled_pcds.append((rim_pcd, rim_idx))
+                continue
+            body_pcd, body_idx = sample_body(meshes[i], n_body)
+            sampled_pcds.append(
+                (
+                    np.concatenate([rim_pcd, body_pcd], axis=0),
+                    np.concatenate([rim_idx, body_idx], axis=0),
                 )
-                for i in range(len(meshes))
-            ]
+            )
         pointclouds_gt = [pcd[0] for pcd in sampled_pcds]
         pointclouds_normals_gt = [
             meshes[i].face_normals[pcd[1]] for i, pcd in enumerate(sampled_pcds)
@@ -182,7 +209,7 @@ class BreakingBadWeighted(BreakingBadBase):
             "redundant_pieces": data["redundant_pieces"],
             "pieces": data["pieces"],
             "mesh_scale": data["mesh_scale"],
-            "meshes": data["meshes"],
+            **({"meshes": data["meshes"]} if "meshes" in data else {}),
         }
 
 if __name__ == "__main__":

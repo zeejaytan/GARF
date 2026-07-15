@@ -11,3 +11,15 @@ num_workers: 16
 num_removal: 0
 num_redundancy: 0
 multi_ref: false
+# Fracture-rim oversampling remedy for worn thin-walled artifacts
+# (JUGLET_ROOTCAUSE_FINDINGS.md). 0.0 = original sampling behaviour.
+rim_oversample_frac: 0.0
+rim_band_frac: 0.05
+rim_relief_pct: 85.0
+# Worn-break augmentation (train split only) — remedy for the encoder blindness
+# found in Exp 10 (JUGLET_ROOTCAUSE_FINDINGS.md). Mollifies each object's true
+# fracture contact band at a random wear strength so the FracSeg encoder learns
+# worn breaks are still fractures. 0.0 = disabled (original behaviour).
+frac_erode_prob: 0.0
+frac_erode_min: 0.3
+frac_erode_max: 1.0

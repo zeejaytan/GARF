@@ -20,3 +20,14 @@ fractura_bone/
 
 # Laptop-side rsync landing zone (see scripts/remote/fetch_artifacts.sh)
 artifacts/
+
+# Local build / IDE / agent noise
+.pytorch3d_build/
+.claude/
+viz_output/
+*.backup
+*.ply
+*.obj
+
+# Regenerable / heavy local graphs
+graphify-out/

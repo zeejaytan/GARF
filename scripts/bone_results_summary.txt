@@ -1,0 +1,56 @@
+BONE FRAGMENT ASSEMBLY RESULTS SUMMARY
+=======================================
+
+BEST CASE: pig_bone_20 (100% part accuracy)
+-------------------------------------------
+- Translation RMSE: 0.0191m (1.9cm)
+- Rotation RMSE: 0.23° (excellent alignment)
+- Shape Chamfer Distance: 0.0011
+- Status: PERFECT ASSEMBLY ✓
+
+CHALLENGING CASE: pig_bone_27 (50% part accuracy)
+-------------------------------------------------
+- Translation RMSE: 0.1445m (14.5cm)
+- Rotation RMSE: 52.01° (significant misalignment)
+- Shape Chamfer Distance: 0.024
+- Status: PARTIAL FAILURE (only 1 of 2 fragments correctly assembled)
+
+ANALYSIS:
+- The model shows mixed performance on bone fragments
+- Best case demonstrates perfect assembly capability
+- Challenging case reveals domain gap issues
+- Performance varies significantly between samples
+
+VISUALIZATION FILES CREATED:
+============================
+
+BEST CASE (pig_bone_20):
+- bone_best_INITIAL_scattered.ply    (6.3MB) - Original fragments
+- bone_best_GROUND_TRUTH.ply         (6.3MB) - Correct assembly
+- bone_best_FINAL_assembled.ply      (6.3MB) - Model prediction
+- bone_best_COMPARISON_all.ply       (12.7MB) - Side-by-side comparison
+
+CHALLENGING CASE (pig_bone_27):
+- bone_challenging_INITIAL_scattered.ply    (34.6MB) - Original fragments
+- bone_challenging_GROUND_TRUTH.ply         (34.6MB) - Correct assembly
+- bone_challenging_FINAL_assembled.ply      (34.6MB) - Model prediction
+- bone_challenging_COMPARISON_all.ply       (69.2MB) - Side-by-side comparison
+
+COLOR CODING:
+- Red fragments: First piece
+- Green fragments: Second piece
+- Blue/Cyan fragments: Model predictions (in comparison files)
+
+DOWNLOAD COMMAND:
+================
+scp zhuojiat@spartan.hpc.unimelb.edu.au:/data/gpfs/projects/punim2657/GARF/bone_*.ply .
+
+VIEWING INSTRUCTIONS:
+====================
+Open the PLY files in:
+- MeshLab (free, cross-platform)
+- CloudCompare (free, cross-platform)
+- Blender (free, can import PLY)
+- Any 3D viewer that supports PLY format
+
+For comparison files, the ground truth is on the left, prediction on the right.

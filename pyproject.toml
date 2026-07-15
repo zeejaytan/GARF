@@ -58,10 +58,8 @@ find-links = [
 ]
 
 [tool.uv.sources]
-source = { workspace = true }
 pytorch3d = { url = "https://github.com/MiroPsota/torch_packages_builder/releases/download/pytorch3d-0.7.8%2B5043d15/pytorch3d-0.7.8+5043d15pt2.8.0cu128-cp312-cp312-linux_x86_64.whl" }
 flash-attn = { url = "https://github.com/Dao-AILab/flash-attention/releases/download/v2.8.3/flash_attn-2.8.3+cu12torch2.8cxx11abiTRUE-cp312-cp312-linux_x86_64.whl" }
-craftsman = { path = "third_party/craftsman", editable = true }
 torch = { index = "pytorch" }
 torchvision = { index = "pytorch" }
 
