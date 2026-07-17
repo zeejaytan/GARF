@@ -18,8 +18,17 @@ LOCAL_DIR="${2:-./artifacts}"
 
 mkdir -p "$LOCAL_DIR"
 
-rsync -avz --progress \
-  "${SPARTAN_HOST}:${REMOTE_ROOT}/${REMOTE_REL}" \
-  "${LOCAL_DIR}/"
+if command -v rsync >/dev/null 2>&1; then
+  rsync -avz --progress \
+    "${SPARTAN_HOST}:${REMOTE_ROOT}/${REMOTE_REL}" \
+    "${LOCAL_DIR}/"
+else
+  # Git Bash on Windows has no rsync; scp -r (Windows OpenSSH) is a fine
+  # fallback for the small artifacts this script is meant for.
+  echo "rsync not found; falling back to scp -r" >&2
+  scp -r \
+    "${SPARTAN_HOST}:${REMOTE_ROOT}/${REMOTE_REL}" \
+    "${LOCAL_DIR}/"
+fi
 
 echo "Fetched → ${LOCAL_DIR}/$(basename "$REMOTE_REL")"

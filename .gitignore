@@ -31,3 +31,8 @@ viz_output/
 
 # Regenerable / heavy local graphs
 graphify-out/
+
+# Spartan-side working data (scrape index, demo viz, raw data landing zone)
+raw/
+link_list.json
+fracture_visualization_demo.png

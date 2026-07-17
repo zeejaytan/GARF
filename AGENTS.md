@@ -1,6 +1,6 @@
-# CLAUDE.md — GARF (project)
+# AGENTS.md — GARF (project)
 
-Follow the workspace root **`../AGENTS.md`** / **`../CLAUDE.md`** (laptop ↔ GitHub ↔ Spartan) for all shared rules. Same overlay as **`AGENTS.md`** in this folder. This file only adds GARF-specific paths and domain notes.
+Follow the workspace root **`../AGENTS.md`** (laptop ↔ GitHub ↔ Spartan) for all shared rules. This file only adds GARF-specific paths and domain notes.
 
 ## GARF paths
 
