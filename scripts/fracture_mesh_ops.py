@@ -169,6 +169,114 @@ def erode_fracture_band(
     return out
 
 
+def sharpen_fracture_band_solo(
+    verts: np.ndarray,
+    faces: np.ndarray,
+    strength: float,
+    *,
+    relief_pct: float = 85.0,
+    band_frac: float = 0.05,
+    kernel_frac: float = 0.03,
+    n_probe: int = 20000,
+    n_self_samples: int = 20000,
+    knn: int = 48,
+    seed: int = 0,
+    region: str = "band",
+) -> np.ndarray:
+    """De-weathering (Exp 14): inverse of ``erode_fracture_band``, pose-free.
+
+    Surface unsharp mask on the detected fracture band: every band vertex is
+    displaced AWAY from its Gaussian-mollified target,
+
+        v' = v + strength * w * (v - mollify(v)),
+
+    amplifying the residual micro-relief that abrasion attenuated — the exact
+    inverse of the mollifier wear model validated causally in Exp 7/7b/10b.
+    True-mate complementarity is preserved to first order: both mating faces
+    carry (mirrored) copies of the same underlying fracture surface, and the
+    transform is a deterministic local functional of that surface, so matching
+    bumps/dents amplify coherently.
+
+    The band is detected per piece with the validated relief-band detector
+    (same statistic and default params as fracseg_introspection / the Exp 8
+    rim sampler) — no assembled pose is needed. PF++ poses give a zero contact
+    band on Juglet (Exp 9), so physical band detection is unusable there; the
+    pose-free detector also makes this transform deployable at inference time
+    on any scan.
+
+    ``region="band"`` sharpens the fracture band (the treatment);
+    ``region="offband"`` sharpens everything BUT the band (Exp 14 arm C
+    specificity control: amplifying the original vessel surface must NOT
+    restore mating). Displacements are clamped to the mollify kernel radius.
+    Returns the new vertex array (faces unchanged; pose preserved).
+    """
+    if strength <= 0:
+        return np.asarray(verts, dtype=np.float64)
+    from scipy.spatial import cKDTree
+
+    rng = np.random.default_rng(seed)
+    mesh = trimesh.Trimesh(vertices=np.asarray(verts, np.float64),
+                           faces=np.asarray(faces, np.int64), process=False)
+    scale = float(max(mesh.extents))
+    if scale <= 0 or len(mesh.faces) < 8:
+        return np.asarray(verts, dtype=np.float64)
+
+    # --- relief-band detection (pose-free, per piece) ---
+    pts, fid = trimesh.sample.sample_surface(mesh, n_probe, seed=int(rng.integers(2**31)))
+    pts = np.asarray(pts, np.float64)
+    fn = mesh.face_normals[fid]
+    r_relief = 0.03 * scale
+    tree = cKDTree(pts)
+    relief = np.zeros(len(pts))
+    for i, nb in enumerate(tree.query_ball_point(pts, r_relief)):
+        if len(nb) < 3:
+            continue
+        cos = fn[nb] @ fn[i]
+        relief[i] = 1.0 - float(np.clip(cos, -1.0, 1.0).mean())
+    if not np.any(relief > 0):
+        return np.asarray(verts, dtype=np.float64)
+    anchors = pts[relief >= np.percentile(relief, relief_pct)]
+    if len(anchors) == 0:
+        return np.asarray(verts, dtype=np.float64)
+
+    v = np.asarray(mesh.vertices, np.float64)
+    d_anchor, _ = cKDTree(anchors).query(v)
+    R = band_frac * scale
+    # Feathered band weight: 1 inside 0.6R, linear to 0 at R.
+    w = np.clip((R - d_anchor) / (0.4 * R), 0.0, 1.0)
+    if region == "offband":
+        w = 1.0 - w
+    elif region != "band":
+        raise ValueError(f"region must be 'band' or 'offband', got {region!r}")
+    active = w > 0
+    if not active.any():
+        return v
+
+    # --- mollified target (same kernel construction as erode_fracture_band) ---
+    r = kernel_frac * scale
+    self_pts, _ = trimesh.sample.sample_surface(mesh, n_self_samples,
+                                                seed=int(rng.integers(2**31)))
+    self_pts = np.asarray(self_pts, np.float64)
+    dist, idx = cKDTree(self_pts).query(v[active], k=knn, distance_upper_bound=r)
+    valid = np.isfinite(dist)
+    sigma = 0.5 * r
+    gw = np.where(valid, np.exp(-0.5 * (dist / sigma) ** 2), 0.0)
+    gw_sum = gw.sum(axis=1, keepdims=True)
+    ok = gw_sum[:, 0] > 1e-12
+    idx_safe = np.where(valid, idx, 0)
+    target = np.einsum("nk,nkd->nd", gw, self_pts[idx_safe]) / np.maximum(gw_sum, 1e-12)
+
+    disp = strength * w[active, None] * (v[active] - target)
+    disp[~ok] = 0.0
+    # Clamp: a de-weathered bump should not exceed the wear scale itself.
+    norm = np.linalg.norm(disp, axis=1, keepdims=True)
+    over = norm[:, 0] > r
+    disp[over] *= r / norm[over]
+    out = v.copy()
+    out[active] = v[active] + disp
+    return out
+
+
 def _rim_face_mask(mesh: trimesh.Trimesh, dihedral_pct: float = 50.0) -> np.ndarray:
     """Faces touching at least one high-dihedral edge (fracture rim band)."""
     if len(mesh.face_adjacency) == 0:

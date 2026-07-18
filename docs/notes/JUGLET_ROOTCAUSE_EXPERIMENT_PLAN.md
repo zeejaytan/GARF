@@ -559,6 +559,59 @@ Run 0 → 1 → 2 → 3 first (cheap and likely decisive); 4 is heavier confirma
   eroded-break-augmented synthetic data, then re-extract features + re-run the
   pairwise oracle / 9-piece assembly).
 
+- **2026-07-18** — Exp 14 (de-weathering sufficiency test) designed + built:
+  `scripts/exp14_dewear_sufficiency.py`, `fracture_mesh_ops.sharpen_fracture_band_solo`,
+  `exp14_dewear_sufficiency.slurm`. Motivation: the mechanism chain (Exp 10/10b)
+  proves only the forward direction (wear → encoder blindness); the decisive
+  missing proof is SUFFICIENCY on the failing object itself — *de-wear the
+  Juglet and both perception and mating must return*. The transform inverts the
+  causally-validated mollifier wear model: a surface unsharp mask
+  `v' = v + s·w·(v − mollify(v))` on the fracture band, with the band detected
+  by the validated pose-free relief detector (PF++ poses give a zero contact
+  band, Exp 9, so physical band detection is unusable — and pose-free means the
+  transform deploys at inference on any scan). Complementarity of true mates is
+  preserved to first order (both faces are mirrored copies of the same
+  underlying surface; the transform is a deterministic local functional of it).
+  Displacements clamped to the mollify kernel radius.
+  - **Arm A (perception gate, probe):** sweep strengths {0, 0.5, 1, 2, 3},
+    frozen-encoder fired% on de-weathered Juglet (Exp 10 readout).
+    Pre-registered: PERCEPTION RESTORED if fired% ≥ 1.5% (≥2.6× the 0.57%
+    baseline); STRONG ≥ 3% (control level 3.4%). Fail → stop, go to Exp 15.
+  - **Arm C (specificity control):** sharpen OFF-band only (original vessel
+    surface). Gate: fired% stays < 1.5× baseline — rules out "any added
+    high-frequency detail helps".
+  - **Arm B (decisive mating test):** rebuild deploy+pairs HDF5 at the best
+    strength, 3-seed pairwise oracle + symmetry-invariant chamfer (reference =
+    ORIGINAL geometry, so scores stay comparable; the band-only clamped
+    displacement biases mates and non-mates equally). Pre-registered:
+    SUFFICIENCY CONFIRMED if true-mate median chamfer/diag ≤ 0.045 AND mate/non
+    separation ≥ 1.25× (baseline 0.070 == 0.073, none); PARTIAL if ≤ 0.055 or
+    separation ≥ 1.15×. Plus full 9-piece de-weathered deploy (GLB). Optional
+    second model arm stacks the Exp 13 co-adapted checkpoint (attacks the gap
+    from both sides: data→model and model→data).
+  - **Arm D (regression, env-gated `RUN_CTRL_REGRESSION=1`):** same transform
+    on the 4 control ceramics; gate true-mate median ≤ 0.030 (from 0.024).
+  - **Interpretation:** A+B pass ⇒ encoder blindness is proven the exact,
+    sufficient cause, and the sharpener IS remedy path 1 (inference-time
+    de-weathering preprocessor, no retraining). A passes but B fails ⇒
+    perception is necessary but the denoiser also lost mating competence on
+    this domain — co-adapt arm disambiguates. A fails ⇒ unsharp amplification
+    cannot recreate the fresh-break texture class ⇒ Exp 15.
+- **2026-07-18** — Exp 15 (designed, contingency): Juglet-domain
+  self-supervised encoder adaptation. Fine-tune FracSeg on Juglet's own nine
+  sherds with pseudo fracture labels from the validated relief-band detector
+  (`relief_band_label`, the Exp 8/10 detector — geometric, independent of the
+  encoder, so no circularity), mixed ~1:4 with the worn-augmented synthetic
+  replay stream of Exp 11 to prevent forgetting; then re-merge the encoder
+  (`merge_worn_encoder.py`), co-adapt the denoiser (Exp 13 recipe), and re-run
+  the pairwise oracle + 9-piece deploy. Success gates identical to Exp 14 arm
+  B. Risk note: only 9 training sherds — heavy geometric augmentation
+  (rotation/crop/resample) and early stopping on the synthetic probe AUC
+  (must stay ≥ 0.90) guard against overfitting. If Exp 14 and 15 both fail
+  their gates, the definitive conclusion is that real weathered supervision
+  (annotated worn archaeological breaks with mating GT) is required — document
+  and close.
+
 ## Deliverables
 
 - `scripts/no_gt_probes.py` + reusable geometry utils.
