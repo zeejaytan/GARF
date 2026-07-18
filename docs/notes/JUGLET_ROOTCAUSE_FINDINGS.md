@@ -395,6 +395,56 @@ labels from the validated relief-band detector) to inject the real worn-texture
 signal the synthetic proxy lacks. Inference knobs, rim sampling, relief amplitude,
 and pseudo-GT labels are all ruled out.
 
+## Addendum 2026-07-19 — Exp 14: de-weathering sufficiency test — perception is
+manipulable, but geometric inversion cannot restore mating
+
+Exp 14 (job 27540860) ran the missing SUFFICIENCY direction on the failing
+object itself: invert the causally-validated mollifier wear model
+(`fracture_mesh_ops.sharpen_fracture_band_solo`, a pose-free surface unsharp
+mask `v' = v + s·w·(v − mollify(v))` on the relief-detected fracture band,
+complementarity-preserving, displacement clamped) and test whether encoder
+perception AND pairwise mating return. Pre-registered gates in the ledger.
+
+**Arm A (perception) — PASSED.** Frozen-encoder fracture response on
+de-weathered Juglet rims: fired% 0.50 → **1.88%** at strength 2.0 (3.8×
+baseline, gate ≥1.5%). Dose-response is an inverted-U: strength 3.0 falls back
+to 1.07% and the control collapses 4.3 → 0.9% — over-sharpening exits the
+texture class the encoder keys on. Restoration is partial: ~0.45× control.
+
+**Arm C (specificity) — PASSED.** Off-band sharpening: 0.22% (below baseline).
+The response is carried by the fracture band, not by added detail per se.
+
+**Arm B (mating, decisive) — FAILED in both model arms.**
+3-seed symmetry-invariant chamfer on de-weathered pairs (reference = original
+geometry, comparable to Exp 6/12/13):
+
+| model on de-weathered pairs | true-mate (mean/med) | non-mate (mean/med) | separation |
+|---|---|---|---|
+| baseline GARF | 0.0687 / 0.0678 | 0.0696 / 0.0607 | none |
+| + Exp 13 co-adapted stack | 0.0663 / 0.0693 | 0.0688 / 0.0638 | none |
+| (gate) | ≤ 0.045 median | — | ≥ 1.25× |
+
+Best pair is again Piece01–04 (0.0291, control quality — same pair Exp 13
+recovered), but the population shows no mate/non separation; de-wear +
+co-adaptation is statistically identical to co-adaptation alone (0.0645).
+
+**Interpretation (per the pre-registered table).** Making the encoder fire on
+the worn band is NOT sufficient to restore mating. Combined with arms A/C this
+sharpens the mechanism statement: the deficit is not "the fracture head is
+silent" per se — it is that worn break faces no longer carry (or GARF cannot
+extract) the fresh-break-class micro-structure that encodes pairwise
+complementarity. Unsharp amplification re-triggers the detector by amplifying
+what remains, but cannot re-synthesize information abrasion destroyed. Two
+readings survive: (a) representation mismatch — a model *adapted to worn
+texture* could still extract the mating signal that remains in the geometry
+(Exp 15 tests exactly this); (b) information loss — the worn surfaces
+genuinely no longer determine the mating; only if 15 also fails does (b)
+become the working conclusion, pointing to real weathered supervision or
+non-fracture cues (wall-profile continuity, decoration) as the only routes.
+
+Outputs: `logs/diagnostics/exp14_probe_{band,offband}_20260718_231248/`,
+`logs/diagnostics/pair_chamfer_juglet_dewear_{base,coadapt}_20260718_231248/`.
+
 ## Artifacts
 
 - Adjacency / true mates: `scripts/derive_pfpp_adjacency.py` →

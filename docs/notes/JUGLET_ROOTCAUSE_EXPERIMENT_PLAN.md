@@ -597,6 +597,17 @@ Run 0 → 1 → 2 → 3 first (cheap and likely decisive); 4 is heavier confirma
     perception is necessary but the denoiser also lost mating competence on
     this domain — co-adapt arm disambiguates. A fails ⇒ unsharp amplification
     cannot recreate the fresh-break texture class ⇒ Exp 15.
+- **2026-07-19** — Exp 14 RESULT (job 27540860): **arm A PASSED** (juglet
+  fired% 0.50→1.88% at strength 2.0, 3.8× baseline; inverted-U — strength 3.0
+  drops to 1.07% and control 4.3→0.9%, over-sharpening exits the texture
+  class), **arm C PASSED** (offband 0.22%, band-specific), **arm B FAILED in
+  both model arms** (base: true-mate 0.0687/0.0678 vs non-mate 0.0696/0.0607;
+  co-adapt stack: 0.0663/0.0693 vs 0.0688/0.0638 — no separation, gates
+  ≤0.045 / ≥1.25× missed). Sufficiency by geometric inversion is NOT
+  achievable: re-triggering the fracture head by amplifying surviving worn
+  texture does not restore mating — the fresh-break-class micro-structure that
+  encodes complementarity cannot be re-synthesized by amplification. Next
+  lever: Exp 15 (below). Findings addendum written.
 - **2026-07-18** — Exp 15 (designed, contingency): Juglet-domain
   self-supervised encoder adaptation. Fine-tune FracSeg on Juglet's own nine
   sherds with pseudo fracture labels from the validated relief-band detector
