@@ -59,11 +59,15 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 
 def face_band_label(verts: np.ndarray, faces: np.ndarray, *,
-                    relief_pct: float = 85.0, band_frac: float = 0.05,
+                    relief_pct: float = 95.0, band_frac: float = 0.015,
                     n_probe: int = 20000, seed: int = 0) -> np.ndarray:
-    """Per-FACE fracture-band pseudo-label from the validated relief detector
-    (same statistic/params as fracseg_introspection.relief_band_label, applied
-    to face centroids)."""
+    """Per-FACE fracture-band pseudo-label from the relief detector (same
+    statistic as fracseg_introspection.relief_band_label, applied to face
+    centroids). Defaults are TIGHTER than the Exp 10 scoring probe
+    (pct 85 / 0.05): that setting marks 40-72% of a sherd as band — usable
+    for scoring, useless as a training label. Calibrated 2026-07-19 on the
+    real sherds: pct 95 / 0.015 gives mean 17% of faces (range 8-31%),
+    matching the expected fracture-edge ribbon of a thin-walled vessel."""
     m = trimesh.Trimesh(vertices=np.asarray(verts, np.float64),
                         faces=np.asarray(faces, np.int64), process=False)
     scale = float(max(m.extents))
@@ -99,8 +103,8 @@ def main() -> None:
     ap.add_argument("--replicas", type=int, default=80,
                     help="Juglet copies in the train split (~1:4 vs the 332 "
                          "synthetic samples)")
-    ap.add_argument("--relief-pct", type=float, default=85.0)
-    ap.add_argument("--band-frac", type=float, default=0.05)
+    ap.add_argument("--relief-pct", type=float, default=95.0)
+    ap.add_argument("--band-frac", type=float, default=0.015)
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--seed", type=int, default=0)
     args = ap.parse_args()
