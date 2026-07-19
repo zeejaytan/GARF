@@ -111,9 +111,12 @@ def main() -> None:
 
     adj = np.asarray(json.load(open(args.adjacency))["adjacency_matrix"])
 
-    print(f"copying replay stream {args.synth_source} -> {args.out} ...")
+    # Build into a tmp path and rename at the end: a partial file must never be
+    # mistaken for a finished one (job 27543511 failed exactly that way).
+    tmp = args.out.with_suffix(args.out.suffix + ".tmp")
+    print(f"copying replay stream {args.synth_source} -> {tmp} ...")
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(args.synth_source, args.out)
+    shutil.copyfile(args.synth_source, tmp)
 
     with h5py.File(args.juglet_source, "r") as src:
         g = src[args.sample]["pieces"]
@@ -147,7 +150,7 @@ def main() -> None:
         "check relief detector params")
 
     pname_dtype = h5py.special_dtype(vlen=str)
-    with h5py.File(args.out, "r+") as dst:
+    with h5py.File(tmp, "r+") as dst:
         sample_keys = []
         for k in range(args.replicas):
             sname = f"artifact/Juglet-ss{k:03d}"
@@ -170,6 +173,7 @@ def main() -> None:
         for s in ("val", "test"):
             split.create_dataset(s, data=np.array(sample_keys[:1], dtype=object))
 
+    tmp.replace(args.out)
     print(f"wrote {args.out}: +{args.replicas} Juglet replicas "
           f"(mean pseudo-band {np.mean(band_fracs)*100:.1f}% of faces), "
           f"pieces spread {spread:.3f} apart (erosion aug no-ops on them)")

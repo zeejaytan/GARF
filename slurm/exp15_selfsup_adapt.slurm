@@ -42,7 +42,17 @@ echo "=== Exp 15 self-supervised Juglet adaptation ==="; date
 
 # ---------- Stage 1: training mix (synthetic replay + pseudo-labeled Juglet) ----------
 MIX=input/juglet_selfsup_mix.hdf5
-if [ ! -f "${MIX}" ] || [ "${FORCE_REBUILD:-0}" = "1" ]; then
+# Skip the (slow) build only if the file is COMPLETE — i.e. actually contains
+# the artifact split (a stale partial copy killed job 27543511).
+MIX_OK=0
+if [ -f "${MIX}" ] && [ "${FORCE_REBUILD:-0}" != "1" ]; then
+    python - "${MIX}" <<'PY' && MIX_OK=1 || MIX_OK=0
+import sys, h5py
+with h5py.File(sys.argv[1], "r") as f:
+    assert "artifact" in f["data_split"], "no artifact split"
+PY
+fi
+if [ "${MIX_OK}" != "1" ]; then
     python scripts/build_juglet_selfsup_hdf5.py \
         --juglet-source input/juglet_deploy_local02.hdf5 \
         --synth-source input/Fractura/bone_synthetic.hdf5 \
