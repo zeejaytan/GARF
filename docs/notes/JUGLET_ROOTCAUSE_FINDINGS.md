@@ -486,24 +486,39 @@ non-mates; best true mate p0709 at 0.0441. The 9-piece deploy GLB confirms no
 assembly. Output: `logs/diagnostics/pair_chamfer_juglet_selfsup_20260719_183735/`,
 probe `logs/diagnostics/exp15_probe_20260719_183735/`.
 
-**Conclusion — the investigation is closed.** With Exp 14 (re-trigger the head
-geometrically → no mating) and Exp 15 (restore the response by genuine domain
-adaptation → no mating), encoder perception has now been manipulated across a
-6× range with NO covariation in pairwise mating skill. Perception was the
-bottleneck's *symptom*, not its substance: hypothesis (b) stands — **the
-Juglet's worn fracture surfaces no longer carry pair-discriminative
-complementary micro-structure in a form GARF's fracture-matching pipeline can
-use.** Centuries of abrasion removed the information itself, not just the
-model's ability to notice it.
+**Conclusion (corrected 2026-07-19 after review).** With Exp 14 (re-trigger
+the head geometrically → no mating) and Exp 15 (restore the response by
+genuine domain adaptation → no mating), encoder perception has been
+manipulated across a 6× range with NO covariation in pairwise mating skill.
+Perception was the bottleneck's *symptom*, not its substance. The supported
+claim is: **GARF's channel — learned point-feature matching on
+fracture-surface micro-texture — carries no pair-discriminative signal on
+this object, at any perception level.** Abrasion destroyed the fresh-break
+micro-texture that channel depends on.
 
-Every in-environment lever is now exhausted and documented: inference knobs
-(Exp 5), rim sampling (Exp 8), relief amplitude (Exp 7/7b), pseudo-GT labels
-(Exp 9), geometric de-weathering (Exp 14), synthetic worn augmentation
-(Exp 11–13), and Juglet-domain self-supervision (Exp 15). Reconstructing this
-artifact requires signal GARF does not model: real weathered-break supervision
-with mating ground truth, or non-fracture cues — wall-thickness profile
-continuity, curvature flow-lines, surface decoration alignment — i.e. the
-cues human archaeologists actually use on worn sherds.
+An earlier draft of this conclusion overclaimed that "the information itself
+is lost." That is refuted by two existence proofs: a human reassembles these
+sherds in minutes from the same geometry, and PF++ produces a coarse but
+sane layout. The mating information SURVIVES in macro-geometry channels GARF
+does not read: the fracture **boundary curves** (the 3D outline of each break
+edge, which stays sharp even when break faces are polished smooth),
+wall-thickness profiles, and vessel-form/surface continuity — the cues human
+archaeologists actually use on worn sherds. Consistent with this, the
+well-aligning pairs in Exp 13/15 share global wall geometry, and the Exp 9
+zero-contact finding shows even PF++'s layout is driven by form, not contact.
+
+Exhausted (all within the micro-texture channel): inference knobs (Exp 5),
+rim sampling (Exp 8), relief amplitude (Exp 7/7b), pseudo-GT labels (Exp 9),
+geometric de-weathering (Exp 14), synthetic worn augmentation (Exp 11–13),
+Juglet-domain self-supervision (Exp 15).
+
+**Open and promising (macro-geometry channel):** test directly whether
+break-boundary curves separate true mates (pairwise partial curve
+registration with curvature signatures — proposed Exp 16); if yes, the
+actionable system is a hybrid: curve/form-based pairing and pose init
+(possibly seeded from the PF++ layout) with fracture-feature refinement
+where signal exists. Real weathered-break supervision with mating GT remains
+the complementary data-side route.
 
 ## Artifacts
 
