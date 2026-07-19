@@ -623,6 +623,19 @@ Run 0 → 1 → 2 → 3 first (cheap and likely decisive); 4 is heavier confirma
   (annotated worn archaeological breaks with mating GT) is required — document
   and close.
 
+- **2026-07-19** — Exp 15 RESULT (jobs 27543298/27543511 failed on builder
+  guard / stale partial file — both fixed: label calibration 95/0.015, atomic
+  tmp+rename build, content-validated skip check; job 27593530 COMPLETED):
+  **perception fully rehabilitated** (Juglet fired% 0.57→3.20, = control-level
+  absolute response, ratio 0.17×→0.53×, synth AUC 0.996 — best of the arc) but
+  **mating still absent** (true-mate 0.0664/0.0623 vs non-mate 0.0638/0.0609,
+  no separation, gates failed; top-3 pairs all non-mates). Combined with
+  Exp 14, encoder response has been moved across a 6× range with zero
+  covariation in mating skill → **hypothesis (b) stands: abrasion destroyed
+  the pair-discriminative micro-structure itself.** Investigation CLOSED;
+  final conclusion + path forward (real weathered supervision or
+  non-fracture cues) in JUGLET_ROOTCAUSE_FINDINGS.md.
+
 ## Deliverables
 
 - `scripts/no_gt_probes.py` + reusable geometry utils.

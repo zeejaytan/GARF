@@ -445,6 +445,66 @@ non-fracture cues (wall-profile continuity, decoration) as the only routes.
 Outputs: `logs/diagnostics/exp14_probe_{band,offband}_20260718_231248/`,
 `logs/diagnostics/pair_chamfer_juglet_dewear_{base,coadapt}_20260718_231248/`.
 
+## Addendum 2026-07-19 — Exp 15: self-supervised Juglet adaptation — perception
+fully rehabilitated, mating still absent. The investigation closes on
+information loss.
+
+Exp 15 (job 27593530) tested the last surviving remedy hypothesis (a):
+representation mismatch — that the worn geometry still carries mating signal
+a worn-adapted encoder could extract. FracSeg was fine-tuned on Juglet's own
+nine sherds with pseudo fracture labels from the relief detector, calibrated
+on the real sherds to the fracture-edge ribbon (pct 95 / band_frac 0.015 →
+mean 18.8% of faces; the Exp 10 scoring params mark 40–72% and are unusable
+as labels), mixed 1:4 with the worn-augmented synthetic replay stream,
+warm-started from the Exp 11 encoder; then merged into GARF and the denoiser
+co-adapted on synthetic data (Exp 13 recipe; Juglet has no GT poses).
+
+**Perception: the best result of the whole arc.**
+
+| readout | frozen | Exp 11 | **Exp 15** |
+|---|---|---|---|
+| Juglet fired% | 0.57 | 0.97 | **3.20** |
+| control fired% | 3.4 | 6.0 | 6.06 |
+| Juglet/control | 0.17× | 0.16× | **0.53×** |
+| synth AUC (guard ≥0.90) | 0.95 | 0.965 | **0.996** |
+
+The adapted encoder responds to Juglet's worn rims at the absolute level the
+original model had on ceramics it assembles (3.2% vs 3.4%), with the ratio
+moving for the first time and zero forgetting. Training on the real worn
+texture did what the synthetic erosion proxy could not.
+
+**Mating: still nothing.** 3-seed pairwise chamfer oracle:
+
+| model | true-mate (mean/med) | non-mate (mean/med) | separation |
+|---|---|---|---|
+| baseline (Exp 6) | 0.070 / — | 0.073 / — | none |
+| Exp 13 co-adapt | 0.0645 / 0.0624 | 0.0671 / 0.0617 | none |
+| **Exp 15 self-sup + co-adapt** | 0.0664 / 0.0623 | 0.0638 / 0.0609 | **none** |
+
+Gates (≤0.045 median, ≥1.25×) failed; the three best-aligned pairs are all
+non-mates; best true mate p0709 at 0.0441. The 9-piece deploy GLB confirms no
+assembly. Output: `logs/diagnostics/pair_chamfer_juglet_selfsup_20260719_183735/`,
+probe `logs/diagnostics/exp15_probe_20260719_183735/`.
+
+**Conclusion — the investigation is closed.** With Exp 14 (re-trigger the head
+geometrically → no mating) and Exp 15 (restore the response by genuine domain
+adaptation → no mating), encoder perception has now been manipulated across a
+6× range with NO covariation in pairwise mating skill. Perception was the
+bottleneck's *symptom*, not its substance: hypothesis (b) stands — **the
+Juglet's worn fracture surfaces no longer carry pair-discriminative
+complementary micro-structure in a form GARF's fracture-matching pipeline can
+use.** Centuries of abrasion removed the information itself, not just the
+model's ability to notice it.
+
+Every in-environment lever is now exhausted and documented: inference knobs
+(Exp 5), rim sampling (Exp 8), relief amplitude (Exp 7/7b), pseudo-GT labels
+(Exp 9), geometric de-weathering (Exp 14), synthetic worn augmentation
+(Exp 11–13), and Juglet-domain self-supervision (Exp 15). Reconstructing this
+artifact requires signal GARF does not model: real weathered-break supervision
+with mating ground truth, or non-fracture cues — wall-thickness profile
+continuity, curvature flow-lines, surface decoration alignment — i.e. the
+cues human archaeologists actually use on worn sherds.
+
 ## Artifacts
 
 - Adjacency / true mates: `scripts/derive_pfpp_adjacency.py` →
