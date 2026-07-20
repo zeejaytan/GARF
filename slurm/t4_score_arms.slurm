@@ -22,7 +22,7 @@ for MODE in none shuffle random zero; do
     python scripts/pfpp_layout_probes.py \
         --pfpp-dir "$INF/t4_${MODE}/0" \
         --pc-npz   "$NPZ" \
-        --mesh-dir /data/gpfs/projects/punim2657/Dataset/Juglet_anchor_centered \
+        --mesh-hdf5 /data/gpfs/projects/punim2657/GARF/input/juglet_deploy.hdf5 --mesh-key artifact/Juglet-000 \
         --out      "$OUT" \
         --tag      "t4_${MODE}" \
         --n-null 0

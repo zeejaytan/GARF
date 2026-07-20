@@ -136,6 +136,22 @@ def load_garf_glb(glb_path: Path, n_points: int, seed: int):
     return clouds, meshes, names
 
 
+def load_meshes_from_hdf5(hdf5_path: Path, key: str):
+    """Load pieces from a GARF HDF5 in npz-native coordinates and order.
+
+    convert_hdf5_to_npz.py samples part_pcs_gt from these exact meshes with
+    pieces sorted numerically, so no frame alignment or matching is needed.
+    """
+    import h5py
+    with h5py.File(hdf5_path, "r") as hf:
+        g = hf[key]["pieces"]
+        keys = sorted(g.keys(), key=lambda x: int(x))
+        meshes = [trimesh.Trimesh(vertices=np.asarray(g[k]["vertices"]),
+                                  faces=np.asarray(g[k]["faces"]),
+                                  process=False) for k in keys]
+    return meshes
+
+
 def match_meshes_to_parts(scan_clouds, mesh_dir: Path):
     """Match npz part order to Piece*.obj by nearest-surface distance.
 
@@ -374,6 +390,9 @@ def main():
     ap.add_argument("--pfpp-dir", type=Path, required=True)
     ap.add_argument("--pc-npz", type=Path, required=True)
     ap.add_argument("--mesh-dir", type=Path, default=None)
+    ap.add_argument("--mesh-hdf5", type=Path, default=None,
+                    help="GARF HDF5 with pieces in npz-native coords (preferred)")
+    ap.add_argument("--mesh-key", default="artifact/Juglet-000")
     ap.add_argument("--garf-glb", type=Path, default=None)
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--tag", default="t0")
@@ -388,7 +407,18 @@ def main():
     scan_clouds, mats = load_pfpp_layout(args.pfpp_dir, args.pc_npz)
     P = len(scan_clouds)
     meshes = names = None
-    if args.mesh_dir is not None and trimesh is not None:
+    if args.mesh_hdf5 is not None and trimesh is not None:
+        meshes = load_meshes_from_hdf5(args.mesh_hdf5, args.mesh_key)
+        names = [f"piece{k}" for k in range(len(meshes))]
+        # sanity: npz clouds must lie on the hdf5 meshes
+        d0 = cKDTree(meshes[0].vertices).query(scan_clouds[0][::50])[0].mean()
+        rel = d0 / (part_diag(scan_clouds[0]) + 1e-12)
+        print(f"hdf5 mesh sanity: part0 mean surface dist {d0:.5f} "
+              f"({rel:.4f} of part diag)")
+        if rel > 0.05:
+            print("WARNING: npz clouds far from hdf5 meshes — dropping meshes")
+            meshes = names = None
+    elif args.mesh_dir is not None and trimesh is not None:
         meshes, names = match_meshes_to_parts(scan_clouds, args.mesh_dir)
 
     results = {}

@@ -25,7 +25,7 @@ TS=$(date +%Y%m%d_%H%M%S)
 python scripts/pfpp_layout_probes.py \
     --pfpp-dir "$PFDIR" \
     --pc-npz   "$PCNPZ" \
-    --mesh-dir /data/gpfs/projects/punim2657/Dataset/Juglet_anchor_centered \
+    --mesh-hdf5 /data/gpfs/projects/punim2657/GARF/input/juglet_deploy.hdf5 --mesh-key artifact/Juglet-000 \
     --garf-glb "$GLB" \
     --out      "logs/diagnostics/pfpp_t0_${TAG}_${TS}" \
     --tag t0 \

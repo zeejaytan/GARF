@@ -57,7 +57,7 @@ echo "=== T0 step 2: layout panel ==="
 python scripts/pfpp_layout_probes.py \
     --pfpp-dir "$PF/output/denoiser/everyday_epoch2000_bs64/inference/juglet_deploy/0" \
     --pc-npz   "$PF/data/pc_data/juglet_deploy/val/00000.npz" \
-    --mesh-dir /data/gpfs/projects/punim2657/Dataset/Juglet_anchor_centered \
+    --mesh-hdf5 /data/gpfs/projects/punim2657/GARF/input/juglet_deploy.hdf5 --mesh-key artifact/Juglet-000 \
     --garf-glb "$GLB" \
     --out      "logs/diagnostics/pfpp_t0_${TS}" \
     --tag t0 \
