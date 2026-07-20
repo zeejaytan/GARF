@@ -137,22 +137,46 @@ def load_garf_glb(glb_path: Path, n_points: int, seed: int):
 
 
 def match_meshes_to_parts(scan_clouds, mesh_dir: Path):
-    """Match npz part order to Piece*.obj by nearest-surface distance."""
+    """Match npz part order to Piece*.obj by nearest-surface distance.
+
+    The npz scan frame may differ from the OBJ frame by a global uniform
+    scale + translation (HDF5 conversion), so first similarity-align the
+    mesh set to the cloud set (global centroid + diagonal ratio), baking the
+    alignment into the returned mesh copies so downstream slot transforms
+    (which live in the npz frame) apply directly.
+    """
     files = sorted(mesh_dir.glob("Piece*.obj"))
     if not files:
         return None, None
     meshes = [trimesh.load(f, force="mesh") for f in files]
-    trees = [cKDTree(m.vertices) for m in meshes]
-    assign = []
+    allc = np.concatenate(scan_clouds, 0)
+    allv = np.concatenate([m.vertices for m in meshes], 0)
+    diag_c = np.linalg.norm(allc.max(0) - allc.min(0))
+    diag_v = np.linalg.norm(allv.max(0) - allv.min(0))
+    s = diag_c / diag_v
+    c_c, c_v = allc.mean(0), allv.mean(0)
+    A = np.eye(4)
+    A[:3, :3] *= s
+    A[:3, 3] = c_c - s * c_v
+    aligned = []
+    for m in meshes:
+        mm = m.copy()
+        mm.apply_transform(A)
+        aligned.append(mm)
+    print(f"mesh->npz similarity: scale {s:.5f}, shift {np.linalg.norm(c_c - c_v):.4f}")
+    trees = [cKDTree(m.vertices) for m in aligned]
+    assign, mean_ds = [], []
     for pc in scan_clouds:
         sub = pc[:: max(1, len(pc) // 200)]
         dists = [t.query(sub)[0].mean() for t in trees]
         assign.append(int(np.argmin(dists)))
+        mean_ds.append(float(np.min(dists)))
     if len(set(assign)) != len(scan_clouds):
         print(f"WARNING: mesh matching not a bijection: {assign}")
         return None, None
-    print("mesh match:", {i: files[a].name for i, a in enumerate(assign)})
-    return [meshes[a] for a in assign], [files[a].name for a in assign]
+    print("mesh match:", {i: files[a].name for i, a in enumerate(assign)},
+          f"mean match dist {np.mean(mean_ds):.5f}")
+    return [aligned[a] for a in assign], [files[a].name for a in assign]
 
 
 # ---------------------------------------------------------------- metrics
@@ -424,11 +448,11 @@ def main():
     def row(tag, s):
         it = s.get("interpenetration")
         v = s["vesselness"]
+        it_col = (f"{it['mean']:.4f} (wt {it['n_watertight']}/{P})"
+                  if it else "n/a")
         md.append(f"| {tag} | {s['compactness']:.3f} | {s['coarse_pairs']}/{len(s['pairs'])} | "
-                  f"{s['fine_pairs']} | {it['mean']:.4f}" if it else
-                  f"| {tag} | {s['compactness']:.3f} | {s['coarse_pairs']}/{len(s['pairs'])} | "
-                  f"{s['fine_pairs']} | n/a")
-        md[-1] += f" | {v['sor_residual']:.4f} | {v['profile_frac']:.3f} |"
+                  f"{s['fine_pairs']} | {it_col}"
+                  f" | {v['sor_residual']:.4f} | {v['profile_frac']:.3f} |")
 
     for tag in ("pfpp", "garf"):
         if tag in results:
