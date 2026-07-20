@@ -1,5 +1,10 @@
 # Why does PF++ form a good Juglet shape? — Success-factor experiment plan
 
+**STATUS: executed 2026-07-20 — results and verdict in
+`PFPP_JUGLET_SUCCESS_FINDINGS.md`** (outcome: the decision matrix's middle
+row — prior composes, tokens gate plausibility — with wear-invariance
+confirmed at output and feature level).
+
 Created 2026-07-19. Mirror-image of `JUGLET_ROOTCAUSE_EXPERIMENT_PLAN.md`
 (which asked why GARF *fails* on Juglet; closed 2026-07-19 with
 `JUGLET_ROOTCAUSE_FINDINGS.md`). This plan asks the complementary question:
