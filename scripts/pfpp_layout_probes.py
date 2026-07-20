@@ -408,7 +408,7 @@ def main():
                                        args.interp_points, args.seed)
 
     # --- nulls
-    for null_name in ("random", "permuted"):
+    for null_name in ("random", "permuted") if args.n_null > 0 else ():
         runs = []
         for k in range(args.n_null):
             if null_name == "random":
@@ -458,6 +458,8 @@ def main():
         if tag in results:
             row(tag, results[tag])
     for tag in ("random", "permuted"):
+        if tag not in results:
+            continue
         a = results[tag]["aggregate"]
         it = a["interpenetration"]
         md.append(f"| {tag} (n={args.n_null}) | {a['compactness']['mean']:.3f}"
