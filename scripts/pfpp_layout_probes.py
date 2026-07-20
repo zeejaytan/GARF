@@ -136,11 +136,30 @@ def load_garf_glb(glb_path: Path, n_points: int, seed: int):
     return clouds, meshes, names
 
 
-def load_meshes_from_hdf5(hdf5_path: Path, key: str):
-    """Load pieces from a GARF HDF5 in npz-native coordinates and order.
+def _umeyama_similarity(src: np.ndarray, dst: np.ndarray) -> np.ndarray:
+    """4x4 similarity (scale+rot+trans) mapping src points -> dst points."""
+    mu_s, mu_d = src.mean(0), dst.mean(0)
+    S, D = src - mu_s, dst - mu_d
+    cov = D.T @ S / len(src)
+    U, sig, Vt = np.linalg.svd(cov)
+    d = np.sign(np.linalg.det(U @ Vt))
+    E = np.diag([1, 1, d])
+    var_s = (S ** 2).sum() / len(src)
+    scale = np.trace(np.diag(sig) @ E) / var_s
+    R = U @ E @ Vt
+    M = np.eye(4)
+    M[:3, :3] = scale * R
+    M[:3, 3] = mu_d - scale * R @ mu_s
+    return M
 
-    convert_hdf5_to_npz.py samples part_pcs_gt from these exact meshes with
-    pieces sorted numerically, so no frame alignment or matching is needed.
+
+def load_meshes_from_hdf5(hdf5_path: Path, key: str, scan_clouds=None):
+    """Load pieces from a GARF HDF5 and align them to the npz scan frame.
+
+    The npz clouds were sampled from an earlier build of the HDF5; later
+    rebuilds (remeshing) moved the global frame, so align by an Umeyama
+    similarity over part centroids (index correspondence, size-sorted
+    fallback). The caller's sanity check decides acceptance.
     """
     import h5py
     with h5py.File(hdf5_path, "r") as hf:
@@ -149,6 +168,32 @@ def load_meshes_from_hdf5(hdf5_path: Path, key: str):
         meshes = [trimesh.Trimesh(vertices=np.asarray(g[k]["vertices"]),
                                   faces=np.asarray(g[k]["faces"]),
                                   process=False) for k in keys]
+    if scan_clouds is None or len(meshes) != len(scan_clouds):
+        return meshes
+    cloud_cents = np.stack([c.mean(0) for c in scan_clouds])
+    for order in ("index", "size"):
+        if order == "index":
+            ms = list(meshes)
+        else:  # match by descending bbox diagonal
+            cloud_rank = np.argsort([-part_diag(c) for c in scan_clouds])
+            mesh_rank = np.argsort([-float(np.linalg.norm(m.extents)) for m in meshes])
+            ms = [None] * len(meshes)
+            for cr, mr in zip(cloud_rank, mesh_rank):
+                ms[cr] = meshes[mr]
+        mesh_cents = np.stack([m.vertices.mean(0) for m in ms])
+        M = _umeyama_similarity(mesh_cents, cloud_cents)
+        resid = np.linalg.norm(
+            apply(M, mesh_cents) - cloud_cents, axis=1).mean()
+        rel = resid / (np.mean([part_diag(c) for c in scan_clouds]) + 1e-12)
+        print(f"hdf5 align ({order}): centroid resid {resid:.4f} ({rel:.4f} diag)")
+        if rel < 0.10:
+            out = []
+            for m in ms:
+                mm = m.copy()
+                mm.apply_transform(M)
+                out.append(mm)
+            return out
+    print("WARNING: hdf5 centroid alignment failed both orderings")
     return meshes
 
 
@@ -408,7 +453,7 @@ def main():
     P = len(scan_clouds)
     meshes = names = None
     if args.mesh_hdf5 is not None and trimesh is not None:
-        meshes = load_meshes_from_hdf5(args.mesh_hdf5, args.mesh_key)
+        meshes = load_meshes_from_hdf5(args.mesh_hdf5, args.mesh_key, scan_clouds)
         names = [f"piece{k}" for k in range(len(meshes))]
         # sanity: npz clouds must lie on the hdf5 meshes
         d0 = cKDTree(meshes[0].vertices).query(scan_clouds[0][::50])[0].mean()
