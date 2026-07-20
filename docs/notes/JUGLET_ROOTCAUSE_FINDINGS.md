@@ -520,6 +520,11 @@ actionable system is a hybrid: curve/form-based pairing and pose init
 where signal exists. Real weathered-break supervision with mating GT remains
 the complementary data-side route.
 
+The mirror-image investigation — *why PF++ succeeds* (which channel carries
+its coarse-but-sane Juglet layout, and whether it is prior completion or
+genuine macro-geometry perception) — is planned in
+`PFPP_JUGLET_SUCCESS_EXPERIMENT_PLAN.md` (T0–T4, 2026-07-19).
+
 ## Artifacts
 
 - Adjacency / true mates: `scripts/derive_pfpp_adjacency.py` →
