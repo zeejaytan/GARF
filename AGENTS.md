@@ -15,6 +15,8 @@ Follow the workspace root **`../AGENTS.md`** (laptop ↔ GitHub ↔ Spartan) for
 
 Heavy data on Spartan only (gitignored): `input/`, `output/`, `logs`, `*.hdf5` / `*.h5`, checkpoints. Local rsync landing zone: `artifacts/`.
 
+**Write rules:** new code → `scripts/` (or existing packages); Slurm → `slurm/` or `scripts/`; method notes → `docs/notes/`; fetched samples → `artifacts/` (not source); HPC paths → `CLAUDE.local.md`. Do not add files at the GARF root.
+
 Typical loop:
 
 ```bash

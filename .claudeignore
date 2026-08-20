@@ -1,0 +1,22 @@
+# Same patterns as .cursorignore. Claude Code's ignore file is not fully
+# reliable (Read can still open a named path); .cursorignore + .gitignore
+# do the real work. Keep this for the @ picker if it honours it.
+
+artifacts/
+input/
+output/
+outputs/
+logs/
+ckpt/
+raw/
+.venv/
+__pycache__/
+graphify-out/
+viz_output/
+
+*.hdf5
+*.h5
+*.ply
+*.obj
+*.out
+*.ext3

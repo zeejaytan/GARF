@@ -1,0 +1,21 @@
+# Skip bulky / regenerable files in Cursor indexing and @-search.
+# Claude Code may still Read a path you name explicitly.
+
+artifacts/
+input/
+output/
+outputs/
+logs/
+ckpt/
+raw/
+.venv/
+__pycache__/
+graphify-out/
+viz_output/
+
+*.hdf5
+*.h5
+*.ply
+*.obj
+*.out
+*.ext3
