@@ -25,7 +25,7 @@
 set -euo pipefail
 
 cd /data/gpfs/projects/punim2657/GARF
-source .venv/bin/activate
+source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
 export PATH=$CUDA_HOME/bin:$PATH

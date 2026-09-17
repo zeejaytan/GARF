@@ -12,7 +12,7 @@ echo "Dataset: input/Fractura/bone_real.hdf5"
 echo "Using original scheduler and config"
 echo ""
 
-source .venv/bin/activate
+source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 
 echo "Starting bone evaluation with original code..."
 

@@ -9,7 +9,7 @@
 # Score the T4 prior-dominance ablation arms with the T0 layout panel.
 set -euo pipefail
 cd /data/gpfs/projects/punim2657/GARF
-source .venv/bin/activate
+source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 
 PF=/data/gpfs/projects/punim2657/Puzzlefusion
 INF=$PF/output/denoiser/everyday_epoch2000_bs64/inference

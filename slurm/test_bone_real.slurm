@@ -16,7 +16,7 @@ echo ""
 echo "Starting GARF evaluation on real bone fractures..."
 
 # Activate environment
-source .venv/bin/activate
+source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 
 # Run evaluation
 HYDRA_FULL_ERROR=1 python eval.py \

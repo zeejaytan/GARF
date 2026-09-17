@@ -14,7 +14,7 @@ PF_VAL="${ROOT}/Puzzlefusion/data/pc_data/juglet_deploy/val"
 prepare() {
   cd "${GARF}"
   # shellcheck source=/dev/null
-  source .venv/bin/activate
+  source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 
   echo "=== Step 1: anchor-center meshes (mandatory for deploy) ==="
   python preprocess_scan_to_anchor_frame.py \

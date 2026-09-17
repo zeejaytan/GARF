@@ -13,7 +13,7 @@ echo "Using srun for proper SLURM integration"
 echo ""
 
 # Activate environment
-source .venv/bin/activate
+source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 
 echo "Starting debug evaluation with srun..."
 

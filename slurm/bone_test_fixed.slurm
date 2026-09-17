@@ -12,7 +12,7 @@ echo "Dataset: input/Fractura/bone_real.hdf5"
 echo "Fix: Override num_nodes=1 to match SLURM config"
 echo ""
 
-source .venv/bin/activate
+source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 
 echo "Starting fixed bone evaluation..."
 

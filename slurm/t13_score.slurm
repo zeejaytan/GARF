@@ -9,7 +9,7 @@
 # Score T1a / T1b / T3 PF++ runs (submit with --dependency=afterok:<gpu job>).
 set -euo pipefail
 cd /data/gpfs/projects/punim2657/GARF
-source .venv/bin/activate
+source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 
 PF=/data/gpfs/projects/punim2657/Puzzlefusion
 INF=$PF/output/denoiser/everyday_epoch2000_bs64/inference

@@ -53,7 +53,7 @@ sherd centroid); it does **not** assert that fragments belong to one vessel.
 
 ```bash
 cd /data/gpfs/projects/punim2657/GARF
-source .venv/bin/activate
+source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 
 python preprocess_scan_to_anchor_frame.py \
   --input-dir /data/gpfs/projects/punim2657/Dataset/Juglet \

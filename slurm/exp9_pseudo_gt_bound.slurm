@@ -25,7 +25,7 @@
 set -euo pipefail
 
 cd /data/gpfs/projects/punim2657/GARF
-source .venv/bin/activate
+source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 
 STAMP=$(date +%Y%m%d_%H%M%S)
 OUT="logs/diagnostics/exp9_pseudogt_${STAMP}"
