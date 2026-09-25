@@ -25,6 +25,12 @@ It also decides whether GARF is worth carrying further at all, which is
 
 Recording what has been ruled out is half the value here. Do not re-run these.
 
+**Not ruled out: whole-vessel shape** (umbrella `U10`, closed 2026-09-25, tested on TORA).
+A LoRA adapter trained on juglets shaped like the answer seated fewer sherds (1 of 9) than
+the untouched model (3), but that fine-tune also damaged placement on its own choosing
+vessels and on an unworn pot (galli_pot 8 → 2 of 10).
+So U10 does **not** narrow this question toward the break edges. It is not a GARF result.
+
 ## Done when
 
 - [ ] A named mechanism, stated as something measurable on a second object — not "domain
