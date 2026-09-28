@@ -1,0 +1,46 @@
+# @package _global_
+
+# G1 / .scratch/rough-worn-dose ticket 01: GARF fine-tune matched to TORA's ticket-09
+# recipe, so the rough/worn comparison is about the method, not the recipe.
+# Deliberately NOT finetune.yaml: that trains the heads and shape embedding
+# (modules_to_save) at lr 2e-4 for 500 passes, ~10x the dose of training.
+#
+# LoRA r128 / a256 / dropout 0.1 on the attention layers of all 6 blocks; everything
+# else frozen (lora_only makes train.py refuse to start otherwise). lr 2e-5, 20 passes,
+# batch 8, last pass kept. The training file is set per arm on the command line
+# (data.data_root, data.categories, data.additional_data_root).
+
+defaults:
+  - denoiser_flow_matching
+  - _self_
+
+experiment_name: rwlora_${now:%Y-%m-%d_%H-%M-%S}
+tags: ["rough_worn_dose", "lora"]
+seed: 42
+
+data:
+  batch_size: 8
+  max_parts: 64   # TORA's u10 configs; GARF's default 20 would drop large breakages
+  num_points_to_sample: 5000
+
+trainer:
+  max_epochs: 20
+  check_val_every_n_epoch: 1000   # no validation; checkpoints save per pass instead
+
+callbacks:
+  model_checkpoint:
+    save_on_train_epoch_end: true
+
+model:
+  optimizer:
+    lr: 2e-5
+  lora_config:
+    _target_: peft.LoraConfig
+    r: 128
+    lora_alpha: 256
+    lora_dropout: 0.1
+    target_modules: "transformer_layers\\.\\d+\\.(self_attn_to_qkv|self_attn_to_out\\.0|global_attn_to_qkv|global_attn_to_out\\.0)"
+
+ckpt_path: output/GARF.ckpt
+finetuning: true
+lora_only: true

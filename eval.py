@@ -40,7 +40,17 @@ def main(cfg: DictConfig):
         cfg.get("trainer"), callbacks=callbacks, logger=loggers
     )
 
-    trainer.test(model, datamodule=datamodule, ckpt_path=cfg.get("ckpt_path"), weights_only=False)
+    ckpt_path = cfg.get("ckpt_path")
+    if cfg.get("lora_ckpt_path"):
+        # A fine-tune checkpoint holds only the adapter weights (on_save_checkpoint),
+        # so load base GARF first and put the adapter on top, as app.py does.
+        model.load_state_dict(
+            torch.load(ckpt_path, map_location="cpu", weights_only=False)["state_dict"]
+        )
+        model.enable_lora(cfg.get("lora_ckpt_path"))
+        ckpt_path = None
+
+    trainer.test(model, datamodule=datamodule, ckpt_path=ckpt_path, weights_only=False)
 
     print("Time taken: ", timer.time_elapsed("test"))
 

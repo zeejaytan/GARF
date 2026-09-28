@@ -47,6 +47,17 @@ def main(cfg: DictConfig):
         model.load_state_dict(state_dict)
         model.enable_lora()
 
+    trainable = [n for n, p in model.named_parameters() if p.requires_grad]
+    print(f"trainable tensors: {len(trainable)}, "
+          f"params: {sum(p.numel() for p in model.parameters() if p.requires_grad)}")
+    if cfg.get("lora_only"):
+        # rough_worn_lora: only adapter weights may train (heads, embeddings, encoder
+        # frozen), or the fine-tune itself can cost sherds.
+        stray = [n for n in trainable if "lora_" not in n]
+        if stray or not trainable:
+            raise SystemExit(f"lora_only: non-LoRA trainable tensors {stray[:10]}")
+        print("lora_only check passed: every trainable tensor is a LoRA weight")
+
     # Initialize the trainer
     trainer: L.Trainer = hydra.utils.instantiate(
         cfg.get("trainer"), callbacks=callbacks, logger=loggers

@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Optional, Tuple
 
 import lightning as L
+import numpy as np
 import torch
 import torch.nn as nn
 import pytorch3d.transforms as transforms
@@ -301,45 +302,28 @@ class DenoiserBase(L.LightningModule):
 
         return output_dict
 
-    def test_step(self, data_dict, idx):
-        output_dict = self(data_dict)
-        loss_dict, _ = self._loss(data_dict, output_dict)
-        self.log_metrics(loss_dict, prefix="test")
-
-        points_per_part = data_dict["points_per_part"]
-        part_valids = points_per_part != 0
-        part_scale = data_dict["scale"][part_valids]  # (valid_P, 1)
-        ref_part = data_dict["ref_part"][part_valids]  # (valid_P,)
-        if self.inference_config.get("anchor_free", False):
-            ref_part = torch.zeros_like(ref_part, dtype=torch.bool)
-        pts = data_dict["pointclouds"]
-        B, P = points_per_part.shape
-
-        gt_trans = data_dict["translations"][part_valids]  # (valid_P, 3)
-        gt_rots = data_dict["quaternions"][part_valids]  # (valid_P, 4)
-        gt_trans_and_rots = torch.cat([gt_trans, gt_rots], dim=-1)  # (valid_P, 7)
-
+    def _sample_poses(self, data_dict, gt_trans_and_rots, ref_part, part_valids,
+                      part_scale):
+        """One attempt: noise -> poses, reference part pinned at its true pose.
+        Returns the final poses (valid_P, 7, half) and every step's poses.
+        Split out of test_step so save_clouds can draw n_generations attempts."""
         noisy_trans_and_rots = torch.randn(
             gt_trans_and_rots.shape, device=self.device
         )  # (valid_P, 7)
         noise_rots = (
-            torch.tensor(R.random(gt_rots.size(0)).as_quat()).float().to(self.device)
+            torch.tensor(R.random(gt_trans_and_rots.size(0)).as_quat()).float().to(self.device)
         )[..., [3, 0, 1, 2]]
         noisy_trans_and_rots[..., 3:] = noise_rots
 
         reference_gt_and_rots = torch.zeros_like(gt_trans_and_rots, device=self.device)
         reference_gt_and_rots[ref_part] = gt_trans_and_rots[ref_part]
 
-        num_parts_cum = nn.functional.pad(
-            torch.cumsum(data_dict["num_parts"], dim=-1), (1, 0), value=0
-        )
         all_steps_preds = []
 
         noisy_trans_and_rots[ref_part] = reference_gt_and_rots[ref_part]
 
         noisy_trans_and_rots = noisy_trans_and_rots.half()
         reference_gt_and_rots = reference_gt_and_rots.half()
-        gt_trans_and_rots = gt_trans_and_rots.half()
 
         for iter in range(self.inference_config.get("max_iters", 1)):
             latent = self._extract_features(data_dict)
@@ -394,6 +378,34 @@ class DenoiserBase(L.LightningModule):
                     dtype=noisy_trans_and_rots.dtype
                 )
                 all_steps_preds.append(noisy_trans_and_rots.clone())
+
+        return noisy_trans_and_rots, all_steps_preds
+
+    def test_step(self, data_dict, idx):
+        output_dict = self(data_dict)
+        loss_dict, _ = self._loss(data_dict, output_dict)
+        self.log_metrics(loss_dict, prefix="test")
+
+        points_per_part = data_dict["points_per_part"]
+        part_valids = points_per_part != 0
+        part_scale = data_dict["scale"][part_valids]  # (valid_P, 1)
+        ref_part = data_dict["ref_part"][part_valids]  # (valid_P,)
+        if self.inference_config.get("anchor_free", False):
+            ref_part = torch.zeros_like(ref_part, dtype=torch.bool)
+        pts = data_dict["pointclouds"]
+        B, P = points_per_part.shape
+
+        gt_trans = data_dict["translations"][part_valids]  # (valid_P, 3)
+        gt_rots = data_dict["quaternions"][part_valids]  # (valid_P, 4)
+        gt_trans_and_rots = torch.cat([gt_trans, gt_rots], dim=-1)  # (valid_P, 7)
+
+        noisy_trans_and_rots, all_steps_preds = self._sample_poses(
+            data_dict, gt_trans_and_rots, ref_part, part_valids, part_scale
+        )
+        num_parts_cum = nn.functional.pad(
+            torch.cumsum(data_dict["num_parts"], dim=-1), (1, 0), value=0
+        )
+        gt_trans_and_rots = gt_trans_and_rots.half()
 
         pred_trans = noisy_trans_and_rots[..., :3].detach()  # (valid_P, 3)
         pred_rots = noisy_trans_and_rots[..., 3:].detach()  # (valid_P, 4)
@@ -529,6 +541,12 @@ class DenoiserBase(L.LightningModule):
         self.rmse_r_list.append(rmse_r)
         self.rmse_t_list.append(rmse_t)
         self.cd_list.append(shape_cd)
+
+        if self.inference_config.get("save_clouds", False):
+            self._save_clouds(
+                data_dict, gt_trans_and_rots, ref_part, part_valids, part_scale,
+                noisy_trans_and_rots, num_parts_cum,
+            )
 
         if self.inference_config.get("write_to_json", True):
             save_dir = os.path.join(self.trainer.log_dir, "json_results")
@@ -696,6 +714,87 @@ class DenoiserBase(L.LightningModule):
                     }
                     with (obj_dir / "view_assembly_0.json").open("w") as f:
                         json.dump(assembly_json, f, indent=2)
+
+    @torch.no_grad()
+    def _save_clouds(self, data_dict, gt_trans_and_rots, ref_part, part_valids,
+                     part_scale, first_attempt, num_parts_cum):
+        """Write TORA's cloud file (<log_dir>/clouds/<index>.npz), one per object,
+        so tora/scripts/own_place.py scores GARF on the same ruler as TORA.
+
+        n_generations attempts: the one test_step already drew, plus fresh draws.
+        GARF moves each sherd rigidly, so generations_proposed = generations_pred.
+        Points are in GARF units (piece-extent scaled); own_place normalises by the
+        true object's longest side itself. garf_part_acc is GARF's own identity-based
+        score per attempt, kept for the reconcile gate.
+        """
+        if self.inference_config.get("anchor_free", False) or self.inference_config.get(
+            "deploy_mode", False
+        ):
+            raise ValueError("save_clouds needs the true-pose anchor and a reference")
+        n_gen = int(self.inference_config.get("n_generations", 1))
+        attempts = [first_attempt]
+        for _ in range(n_gen - 1):
+            attempts.append(
+                self._sample_poses(
+                    data_dict, gt_trans_and_rots.float(), ref_part, part_valids,
+                    part_scale,
+                )[0]
+            )
+
+        points_per_part = data_dict["points_per_part"]
+        pts = data_dict["pointclouds"]
+        if pts.ndim != 3:
+            raise ValueError("save_clouds supports weighted sampling (B, N_sum, 3) only")
+        B, N_sum, C = pts.shape
+        counts = points_per_part[part_valids]  # (valid_P,)
+        scale = part_scale.repeat_interleave(counts, dim=0)  # (B*N_sum, 1)
+        flat = pts.reshape(-1, C).float() * scale.float()  # (B*N_sum, 3)
+
+        def assemble(poses):
+            poses = poses.float().repeat_interleave(counts, dim=0)
+            return transforms.quaternion_apply(poses[:, 3:], flat) + poses[:, :3]
+
+        gt = gt_trans_and_rots.float()
+        pts_gt = assemble(gt).view(B, N_sum, C)
+        preds = [assemble(a).view(B, N_sum, C) for a in attempts]
+
+        num_parts_wo_redundancy = data_dict["num_parts"] - data_dict["redundancy"]
+        part_valids_wo_redundancy = (
+            torch.cumsum(part_valids, dim=-1) <= num_parts_wo_redundancy[:, None]
+        ) & part_valids
+        accs = []
+        for a in attempts:
+            a = a.float()
+            accs.append(
+                calc_part_acc_weighted(
+                    flat.view(B, N_sum, C),
+                    gt_trans=gt[:, :3], gt_rots=gt[:, 3:],
+                    pred_trans=a[:, :3], pred_rots=a[:, 3:],
+                    points_per_part=points_per_part, part_valids=part_valids,
+                    part_valids_wo_redundancy=part_valids_wo_redundancy,
+                )
+            )
+
+        save_dir = Path(self.trainer.log_dir or self.trainer.default_root_dir) / "clouds"
+        save_dir.mkdir(parents=True, exist_ok=True)
+        for b in range(B):
+            ppp = points_per_part[b][part_valids[b]].cpu().numpy().astype(np.int64)
+            gen = np.stack([p[b].cpu().numpy() for p in preds]).astype(np.float32)
+            np.savez_compressed(
+                save_dir / f"{data_dict['index'][b].item()}.npz",
+                name=str(data_dict["name"][b]),
+                pts_gt=pts_gt[b].cpu().numpy().astype(np.float32),
+                points_per_part=ppp,
+                part_ids=np.arange(len(ppp), dtype=np.int64),
+                generations_pred=gen,
+                generations_proposed=gen,
+                garf_part_acc=np.array(
+                    [float(acc[b]) for acc in accs], dtype=np.float32
+                ),
+                garf_n_parts=np.int64(
+                    part_valids_wo_redundancy[b].sum().item()
+                ),
+            )
 
     def on_test_epoch_end(self):
         return self.on_validation_epoch_end()
