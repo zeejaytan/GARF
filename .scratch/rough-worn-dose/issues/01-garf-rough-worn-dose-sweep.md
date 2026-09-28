@@ -52,6 +52,34 @@ not train. Two contributors remain possible and are gated rather than assumed aw
   untouched GARF by best of 20 on the Juglet and on each of the 8 Fractura pots. Any pot
   that loses a sherd means stop and report: the 12 rough/worn arms do not start.
 
+### Result, seed 42 (2026-09-29): gate FAILED on narrow_bottle1
+
+Untouched 31449317 COMPLETED 0:0 (13 min); fresh 31449318 COMPLETED 0:0 (32 min; 48 LoRA
+tensors, 4.7 M params, `lora_only` check passed). In-job scoring failed: the cloud writer
+stored one `part_ids` per sherd, not per point (fixed 9e3af7b; the 98 files relabelled, no
+coordinates touched). Rescored on CPU, 31481372 COMPLETED 0:0. Reconcile: 0 mismatches,
+0 borderline over 980 attempts per arm.
+
+Own place, pot-size ruler, best of 20 (attempts reaching it; median):
+
+| pot | untouched | fresh |
+|---|---|---|
+| Juglet | 4/9 (2; 2) | 6/9 (1; 2) |
+| narrow_bottle1 | 6/12 (1; 4) | **2/12 (3; 1)** |
+| galli_pot | 10/10 (1; 8) | 10/10 (5; 9) |
+| narrow_bottle3 | 2/4 (1; 1) | 2/4 (2; 1) |
+| blue_pot, narrow_bottle2, narrow_bottle4, pink_bowl, plate | all home | all home |
+
+narrow_bottle1's whole spread moved down, not only the best. Looked at
+(`artifacts/rwlora/nb1_best2.png`, own debugging view): untouched's best seats neck and upper
+body with the lower sherds thrown below; fresh's best crowds sherds into the body, misplaced,
+neck gone. A real change in placement, not a ruler fault. The Juglet gain rests on one
+attempt of 20. Same pot TORA's generic adapter lost a sherd on.
+
+Conservator chose (2026-09-29): repeat the fresh training at seed 7 before deciding —
+31482030 (GARF cfc7b5a, polled). If narrow_bottle1 drops again, the loss is the fine-tune;
+if not, seed 42 was an unlucky run.
+
 ## What we already know, so it is not re-run
 
 GARF's worn-break remedies (Exp 11–15: worn-trained encoder, co-adapted denoiser,
@@ -68,6 +96,8 @@ training is a TORA quirk.
       `tora/artifacts/u10/r09/sectionsN8_{6_7,0_1}.png`: break face ±1 mm on a 2 mm wall,
       spikes ~0.7 mm proud of the wall faces — the extreme endpoint; linked as
       `dataset/u10_noise_d800.hdf5`)
-- [ ] Plumbing gate passed (reconcile + render)
+- [ ] Plumbing gate passed (reconcile + render) — reconcile passed 2026-09-29; Juglet render
+      beside the conservator's reassembly still to do
+- [ ] Damage gate passed — seed 42 failed on narrow_bottle1 (6 → 2 of 12); seed 7 running
 - [ ] 13 arms trained and evaluated; best-of-20 table beside TORA's
 - [ ] Best attempts staged for the conservator
