@@ -76,9 +76,16 @@ body with the lower sherds thrown below; fresh's best crowds sherds into the bod
 neck gone. A real change in placement, not a ruler fault. The Juglet gain rests on one
 attempt of 20. Same pot TORA's generic adapter lost a sherd on.
 
-Conservator chose (2026-09-29): repeat the fresh training at seed 7 before deciding —
-31482030 (GARF cfc7b5a, polled). If narrow_bottle1 drops again, the loss is the fine-tune;
-if not, seed 42 was an unlucky run.
+Seed 7 repeat of the fresh training submitted: 31482030 (GARF cfc7b5a, polled). If
+narrow_bottle1 drops again, the loss is the fine-tune; if not, seed 42 was an unlucky run.
+
+**Conservator's decision (2026-09-29): run the 12 arms anyway.** Each rough/worn arm is
+judged against the **retrained (fresh) GARF**, not released GARF, so the comparison isolates
+the break surface from the fine-tune itself. narrow_bottle1 is a known casualty of the
+fine-tune and is reported but not read as a rough/worn effect. Submitted at b3b8558:
+noise_d025 31482363, d050 31482364, d100 31482365, d200 31482366, d400 31482367,
+d800 31482368; worn_d025 31482369, d050 31482370, d100 31482371, d200 31482372,
+d400 31482373, d800 31482374 (all polled).
 
 ## What we already know, so it is not re-run
 
@@ -96,8 +103,11 @@ training is a TORA quirk.
       `tora/artifacts/u10/r09/sectionsN8_{6_7,0_1}.png`: break face ±1 mm on a 2 mm wall,
       spikes ~0.7 mm proud of the wall faces — the extreme endpoint; linked as
       `dataset/u10_noise_d800.hdf5`)
-- [ ] Plumbing gate passed (reconcile + render) — reconcile passed 2026-09-29; Juglet render
-      beside the conservator's reassembly still to do
-- [ ] Damage gate passed — seed 42 failed on narrow_bottle1 (6 → 2 of 12); seed 7 running
+- [x] Plumbing gate passed (2026-09-29): reconcile 0 mismatches over 980 attempts per arm;
+      untouched best Juglet attempt drawn over its reference (`artifacts/rwlora/jug_untouched.png`):
+      the reference is the juglet (neck, handle ring), 4 home sherds sit on it, the rest sink
+      into the body — count and picture agree
+- [ ] Damage gate — seed 42 failed on narrow_bottle1 (6 → 2 of 12); seed 7 running; overridden
+      by the conservator: arms judged against retrained GARF
 - [ ] 13 arms trained and evaluated; best-of-20 table beside TORA's
 - [ ] Best attempts staged for the conservator
