@@ -785,7 +785,7 @@ class DenoiserBase(L.LightningModule):
                 name=str(data_dict["name"][b]),
                 pts_gt=pts_gt[b].cpu().numpy().astype(np.float32),
                 points_per_part=ppp,
-                part_ids=np.arange(len(ppp), dtype=np.int64),
+                part_ids=np.repeat(np.arange(len(ppp), dtype=np.int64), ppp),  # one per point, as TORA stores
                 generations_pred=gen,
                 generations_proposed=gen,
                 garf_part_acc=np.array(
