@@ -64,7 +64,10 @@ this sweep trains only the denoiser, as TORA's did. If rough helps TORA but noth
 GARF, that is consistent with the encoder being the limit — not evidence that rough
 training is a TORA quirk.
 
-- [ ] Rough 8× built and one join rendered (TORA job 31449062)
+- [x] Rough 8× built and one join rendered (TORA job 31449062 COMPLETED 0:0, 2026-09-28;
+      `tora/artifacts/u10/r09/sectionsN8_{6_7,0_1}.png`: break face ±1 mm on a 2 mm wall,
+      spikes ~0.7 mm proud of the wall faces — the extreme endpoint; linked as
+      `dataset/u10_noise_d800.hdf5`)
 - [ ] Plumbing gate passed (reconcile + render)
 - [ ] 13 arms trained and evaluated; best-of-20 table beside TORA's
 - [ ] Best attempts staged for the conservator
