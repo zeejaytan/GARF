@@ -15,12 +15,13 @@
 # Juglet, the 8 Fractura pots and the erosion ladder, anchor = largest sherd at its true
 # pose, scored by TORA's own_place on the pot-size ruler, plus the GARF<->own_place
 # reconcile gate. SETS overrides the test sets (default all three).
-#   sbatch --export=ALL,ARM=fresh slurm/rwlora_arm.slurm
+#   sbatch --export=ALL,ARM=fresh slurm/rwlora_arm.slurm   (SEED=7 repeats the training)
 
 set -euo pipefail
 ARM="${ARM:?set ARM}"
 SETS="${SETS:-juglet_gt fractura_fresh erosion_ceramics}"
 DRAWS="${DRAWS:-20}"
+SEED="${SEED:-42}"   # training seed only; the 20 attempts are always drawn with seed 42
 cd /data/gpfs/projects/punim2657/GARF
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
@@ -31,13 +32,13 @@ TORA=/data/gpfs/projects/punim2657/TORA/repo
 STAMP="${SLURM_JOB_ID:-local}"
 BASE=output/GARF.ckpt
 
-echo "=== rwlora arm=${ARM} sets=${SETS} draws=${DRAWS} $(date) ==="
+echo "=== rwlora arm=${ARM} train-seed=${SEED} sets=${SETS} draws=${DRAWS} $(date) ==="
 echo "GPU: $(nvidia-smi --query-gpu=name --format=csv,noheader)"
 echo "GARF $(git rev-parse --short HEAD)"
 
 LORA_ARGS=()
 if [ "$ARM" != "untouched" ]; then
-    EXP="rwlora_${ARM}_${STAMP}"
+    EXP="rwlora_${ARM}_s${SEED}_${STAMP}"
     if [ "$ARM" = "fresh" ]; then
         DATA=(data.data_root=$DS/u10_generic.hdf5 "data.categories=[u10_generic,u10_ceiling]"
               "+data.additional_data_root={u10_ceiling:'$DS/u10_ceiling.hdf5'}")
@@ -47,7 +48,7 @@ if [ "$ARM" != "untouched" ]; then
         DATA=(data.data_root=$DS/$F.hdf5 "data.categories=[$F]")
     fi
     python train.py \
-        experiment=rough_worn_lora experiment_name="$EXP" \
+        experiment=rough_worn_lora experiment_name="$EXP" seed=$SEED \
         loggers=csv loggers.csv.save_dir=logs/rwlora \
         trainer.num_nodes=1 trainer.devices=1 trainer.precision=bf16-mixed \
         +trainer.limit_val_batches=0 +trainer.num_sanity_val_steps=0 \
