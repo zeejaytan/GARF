@@ -155,6 +155,27 @@ Weight: one training run per arm, one real pot, 20 attempts. The Juglet 9/9 is a
 attempt — a lead for the eye, not a result, until the conservator has looked and it repeats
 at a second seed.
 
+## Follow-up: seed-7 repeats and 16× (conservator, 2026-09-29: "both")
+
+Advised against 16× first: rough 8× already zig-zags ±1 mm on a 2 mm wall and has passed
+its peak; worn 16× trains on ~3 mm gaps against the Juglet's 0.17 mm. The open question is
+whether worn 4×'s 9/9 repeats. Conservator chose both.
+
+| run | job |
+|---|---|
+| worn 4× seed 7 (GARF) | 31526349 |
+| rough 1× seed 7 (GARF) | 31526350 |
+| build rough 16× `u10_noise_d1600` (TORA) | 31526347 |
+| build worn 16× `u10_worn_d1600` (TORA) | 31526348 |
+
+16× builds are rendered at the same two joins in the 5 mm window before linking into
+`dataset/` or training. Readings, fixed before results:
+- Worn 4× seed 7 reaches ≥ 8/9 on the Juglet → the 9/9 is a repeatable lead, stage and
+  offer refute-finding; ≤ 6/9 (fresh's level) → one lucky run, as TORA's worn 4× was.
+- Rough 1× seed 7 ≥ 7/9 and ladder e075 ≥ 30 → rough 1× holds for GARF as for TORA.
+- 16× beats its 8× on the Juglet **and** e100 → the ceiling is past 8×; otherwise 8× was
+  already past the peak and the sweep is bounded.
+
 ## What we already know, so it is not re-run
 
 GARF's worn-break remedies (Exp 11–15: worn-trained encoder, co-adapted denoiser,
