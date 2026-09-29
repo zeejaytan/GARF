@@ -176,6 +176,28 @@ whether worn 4×'s 9/9 repeats. Conservator chose both.
 - 16× beats its 8× on the Juglet **and** e100 → the ceiling is past 8×; otherwise 8× was
   already past the peak and the sweep is bounded.
 
+**Seed-7 repeats (2026-09-29).** 31526349 worn 4×, 31526350 rough 1×: COMPLETED 0:0 (34 min),
+lora_only passed, reconcile 0 mismatches. Best of 20 (attempts reaching it):
+
+| arm | Juglet | Fractura sum | e075 | e100 |
+|---|---|---|---|---|
+| fresh s42 / s7 | 6/9 (1) / 6/9 (2) | 35 / 35 | 25 / 25 | 19 / 19 |
+| rough 1× s42 / s7 | 7/9 (4) / 7/9 (1) | 37 / 39 | 32 / 34 | 26 / 25 |
+| worn 4× s42 / s7 | 9/9 (1) / 8/9 (3) | 37 / 36 | 30 / 29 | 21 / 23 |
+
+Looked at (`artifacts/rwlora/jug_arms_s7.png`): worn 4× s7 attempt 1 seats 8 of 9, sherd 1 (small,
+lower body) off at 42% of pot; the rest within 1.6-6.9% of pot. Rough 1× s7 attempt 16 misses
+sherds 1 and 4. Both readings met: worn 4×'s Juglet lead repeats (≥ 8/9), and rough 1× holds on
+the Juglet and at e075. narrow_bottle1 stays lost in both (2 and 4 of 12).
+
+**16× builds (2026-09-29).** 31526347 rough (23 min), 31526348 worn (31 min): COMPLETED 0:0,
+885 breakages 698/187, none dropped, none still touching. rms 2.41%; worn gap p50 2.47%, skin
+median 1.25% / max 2.56% (the wall faces move, ~0.8 / 1.7 mm on the Juglet); rough skin 0.
+Looked at (`tora/artifacts/u10/r09/sections16_{6_7,0_1}.png`, same joins, 5 mm window): rough 16×
+is a tangle of ±2 mm spikes through both faces; worn 16× opens the join 2-2.5 mm and at join
+6/7 tilts the wall faces. Both past any real sherd edge, as advised; linked on the
+conservator's decision. Training: rough 16× 31534680, worn 16× 31534681 (seed 42, as 8×).
+
 ## What we already know, so it is not re-run
 
 GARF's worn-break remedies (Exp 11–15: worn-trained encoder, co-adapted denoiser,
