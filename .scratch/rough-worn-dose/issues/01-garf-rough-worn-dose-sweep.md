@@ -198,6 +198,22 @@ is a tangle of ±2 mm spikes through both faces; worn 16× opens the join 2-2.5 
 6/7 tilts the wall faces. Both past any real sherd edge, as advised; linked on the
 conservator's decision. Training: rough 16× 31534680, worn 16× 31534681 (seed 42, as 8×).
 
+**16× results (2026-09-30).** 31534680 rough, 31534681 worn: COMPLETED 0:0 (34 min), lora_only
+passed, reconcile 0 mismatches. Best of 20 (attempts):
+
+| arm | Juglet | Fractura sum | e050 | e075 | e100 |
+|---|---|---|---|---|---|
+| fresh s42 | 6/9 (1) | 35 | 34 | 25 | 19 |
+| rough 8× → 16× | 4/9 (1) → 5/9 (1) | 36 → 35 | 37 → 31 | 26 → 27 | 26 → 25 |
+| worn 8× → 16× | 7/9 (4) → 7/9 (1) | 36 → 35 | 38 → 33 | 28 → 24 | 24 → 24 |
+
+Looked at (`artifacts/rwlora/jug_arms_16.png`): rough 16× best leaves the lower body jumbled
+(3 off, 1 swapped); worn 16× best misses 2 sherds (1 swapped, 1 off). Reading: neither 16×
+beats its 8× on the Juglet **and** e100, so **8× was already past the peak; the sweep is
+bounded.** Worn 16× starts costing sherds elsewhere: galli_pot 9/10 (10/10 in every other
+arm), plate 6/6 in only 5 of 20 attempts (14-20 elsewhere), e050 below fresh. Best GARF
+strengths stay rough 1×-4× for eroded pots and worn 4× for the Juglet.
+
 ## What we already know, so it is not re-run
 
 GARF's worn-break remedies (Exp 11–15: worn-trained encoder, co-adapted denoiser,
