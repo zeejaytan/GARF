@@ -87,6 +87,74 @@ noise_d025 31482363, d050 31482364, d100 31482365, d200 31482366, d400 31482367,
 d800 31482368; worn_d025 31482369, d050 31482370, d100 31482371, d200 31482372,
 d400 31482373, d800 31482374 (all polled).
 
+## Results (2026-09-29)
+
+All 13 jobs COMPLETED 0:0, ~34 min each: fresh seed 7 31482030; rough 31482363-68; worn
+31482369-74. Every job: `lora_only` passed, reconcile 0 mismatches / 0 borderline over 980
+attempts, in-job own_place ran (writer fix 9e3af7b). Table from
+`logs/rwlora/rw_table.py`, own place on the pot-size ruler, best of 20 (attempts reaching it):
+
+```
+JUGLET + FRACTURA, best of 20 (attempts reaching it)
+arm         Juglet     blue_pot  galli_pot narrow_bo narrow_bo narrow_bo narrow_bo pink_bowl plate     fract sum
+untouched   4/9 (2)    5/5(20)   10/10(1)  6/12(1)   3/3(20)   2/4(1)    4/4(20)   3/3(20)   6/6(18)   39
+fresh s42   6/9 (1)    5/5(20)   10/10(5)  2/12(3)   3/3(20)   2/4(2)    4/4(19)   3/3(20)   6/6(17)   35
+fresh s7    6/9 (2)    5/5(20)   10/10(10) 2/12(3)   3/3(20)   2/4(6)    4/4(20)   3/3(20)   6/6(17)   35
+rough 1/4   5/9 (1)    5/5(20)   10/10(9)  2/12(5)   3/3(20)   3/4(2)    4/4(20)   3/3(20)   6/6(20)   36
+rough 1/2   7/9 (1)    5/5(20)   10/10(14) 5/12(1)   3/3(20)   3/4(2)    4/4(20)   3/3(20)   6/6(20)   39
+rough 1     7/9 (4)    5/5(20)   10/10(11) 2/12(13)  3/3(20)   4/4(2)    4/4(20)   3/3(20)   6/6(20)   37
+rough 2     5/9 (8)    5/5(20)   10/10(10) 2/12(8)   3/3(20)   4/4(1)    4/4(20)   3/3(20)   6/6(19)   37
+rough 4     6/9 (1)    5/5(20)   10/10(10) 3/12(4)   3/3(20)   4/4(3)    4/4(20)   3/3(20)   6/6(19)   38
+rough 8     4/9 (1)    5/5(20)   10/10(9)  2/12(3)   3/3(20)   3/4(1)    4/4(19)   3/3(20)   6/6(19)   36
+worn 1/4    6/9 (1)    5/5(20)   10/10(8)  2/12(5)   3/3(20)   2/4(6)    4/4(19)   3/3(20)   6/6(14)   35
+worn 1/2    5/9 (4)    5/5(20)   10/10(5)  2/12(4)   3/3(20)   2/4(5)    4/4(20)   3/3(20)   6/6(16)   35
+worn 1      4/9 (3)    5/5(20)   10/10(9)  2/12(6)   3/3(20)   2/4(2)    4/4(20)   3/3(20)   6/6(14)   35
+worn 2      7/9 (1)    5/5(20)   10/10(13) 2/12(4)   3/3(20)   3/4(8)    4/4(20)   3/3(20)   6/6(18)   36
+worn 4      9/9 (1)    5/5(20)   10/10(15) 2/12(7)   3/3(20)   4/4(2)    4/4(20)   3/3(20)   6/6(19)   37
+worn 8      7/9 (4)    5/5(20)   10/10(16) 2/12(3)   3/3(20)   4/4(1)    4/4(20)   2/3(20)   6/6(18)   36
+
+LADDER: sum over pots of best-of-20 sherds home, per erosion level
+arm         e000     e025     e050     e075     e100    
+untouched   39/47    38/47    36/47    23/47    21/47   
+fresh s42   38/47    36/47    34/47    25/47    19/47   
+fresh s7    40/47    36/47    34/47    25/47    19/47   
+rough 1/4   41/47    38/47    36/47    28/47    21/47   
+rough 1/2   39/47    37/47    40/47    30/47    23/47   
+rough 1     41/47    39/47    40/47    32/47    26/47   
+rough 2     40/47    38/47    38/47    29/47    27/47   
+rough 4     41/47    38/47    38/47    28/47    28/47   
+rough 8     39/47    38/47    37/47    26/47    26/47   
+worn 1/4    38/47    34/47    35/47    24/47    19/47   
+worn 1/2    39/47    35/47    35/47    24/47    18/47   
+worn 1      40/47    34/47    35/47    26/47    21/47   
+worn 2      41/47    38/47    37/47    28/47    22/47   
+worn 4      40/47    39/47    38/47    30/47    21/47   
+worn 8      42/47    39/47    38/47    28/47    24/47
+```
+
+**Damage gate, settled:** seed 7 repeats seed 42 exactly on narrow_bottle1 (6 → 2 of 12)
+and on the Juglet (4 → 6). The loss is the fine-tune, not an unlucky run. Every arm is read
+against fresh (6/9 Juglet, 35 Fractura, both seeds), as the conservator decided.
+
+**Juglet:** worn 4× best attempt seats 9 of 9 (1 of 20 attempts; next best arm 7). Looked at
+(`artifacts/rwlora/jug_arms.png`, own debugging view): the whole juglet assembled, the
+furthest sherd 5.1% of pot size (~3.3 mm) from home. Staged for the conservator as
+`garf_juglet_worn4x_rw01` (meshes posed by `tora/.scratch/anchor-choice/scripts/pose_meshes.py`,
+fit ≤ 0.021 mm). Otherwise the Juglet column is noisy: most arms' best rests on 1-4 attempts,
+worn 1× is 4, worn 2× 7, worn 8× 7 — no clean dose curve on one pot.
+
+**Ladder (the cross-check):** rough training lifts GARF on eroded breaks and the heaviest
+erosion prefers heavier roughness: at e075 fresh 25/47 → rough 1× 32; at e100 fresh 19 →
+rough 4× 28, rough 2× 27. Worn lifts e075 (30 at 4×) but not e100 (≤ 24). At e000-e025 all
+arms sit within 3 sherds of each other.
+
+**Fractura:** no rough/worn arm restores narrow_bottle1 (best 5/12 at rough ½×); narrow_bottle3
+gains 2 → 4 of 4 at rough 1×-4× and worn 4×-8×; worn 8× loses one sherd of pink_bowl.
+
+Weight: one training run per arm, one real pot, 20 attempts. The Juglet 9/9 is a single
+attempt — a lead for the eye, not a result, until the conservator has looked and it repeats
+at a second seed.
+
 ## What we already know, so it is not re-run
 
 GARF's worn-break remedies (Exp 11–15: worn-trained encoder, co-adapted denoiser,
@@ -107,7 +175,10 @@ training is a TORA quirk.
       untouched best Juglet attempt drawn over its reference (`artifacts/rwlora/jug_untouched.png`):
       the reference is the juglet (neck, handle ring), 4 home sherds sit on it, the rest sink
       into the body — count and picture agree
-- [ ] Damage gate — seed 42 failed on narrow_bottle1 (6 → 2 of 12); seed 7 running; overridden
-      by the conservator: arms judged against retrained GARF
-- [ ] 13 arms trained and evaluated; best-of-20 table beside TORA's
-- [ ] Best attempts staged for the conservator
+- [x] Damage gate — failed, and confirmed at seed 7 (narrow_bottle1 6 → 2 of 12 both seeds);
+      overridden by the conservator: arms judged against retrained GARF
+- [x] 13 arms trained and evaluated; best-of-20 table (2026-09-29, Results above); beside TORA's below
+- [ ] Best attempts staged for the conservator — worn 4× Juglet (9/9) staged 2026-09-29 as
+      `garf_juglet_worn4x_rw01` (surface coincidence median 0.28 mm; gates check_annotations,
+      check_stage_pair OK; check_loader / check_mesh_loader fail on their own missing fixtures,
+      as since 2026-09-26). Awaiting the conservator's look; other arms not staged
