@@ -57,7 +57,14 @@ and worn reproduced). Suspected GPU non-determinism; two identical clean-break r
 (31879925-26) test it. Size so far: ≤ 0.15 sherd per attempt, an order below the presentation
 effect.
 
-- [x] Knob added; default reproduces worn 4× exactly, clean-break within 0.15 (see above)
+Repeatability check (31879925-26, COMPLETED 0:0, reconcile 0): the four clean-break runs of
+the same setting fall into exactly two bit-identical outcomes, split by GPU node, not by
+chance: gpgpu123 (31449318, 31879926) gives mean 2.10; gpgpu112 and gpgpu116 (31835698,
+31879925) give 2.25. Worn 4× matched across gpgpu108 and gpgpu112. So a run is exactly
+repeatable on the same machine, and machines can differ by a few sherds on a few attempts
+(here ≤ 0.15 sherd per attempt). Not the knob.
+
+- [x] Knob added, default unchanged (worn 4× bit-identical; clean-break identical per node)
 - [x] Both arms run, sacct recorded, reconcile 0
 - [x] Table
 - [ ] Render of the deciding comparison: what differs between presentations 42 and 7 on the
