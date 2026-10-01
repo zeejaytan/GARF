@@ -1,6 +1,6 @@
 # G1 — Why does GARF fail on the Juglet?
 
-**Status:** open — a lead (break-face training), no mechanism named yet · **Blocked by:** none
+**Status:** open — four mechanisms ruled out, none found · **Blocked by:** none
 **Effort:** the investigation is largely done; what remains is a decision about how much
 more to spend
 
@@ -36,38 +36,36 @@ the untouched model (3), but that fine-tune also damaged placement on its own ch
 vessels and on an unworn pot (galli_pot 8 → 2 of 10).
 So U10 does **not** narrow this question toward the break edges. It is not a GARF result.
 
-## Lead: what the break faces look like in training (2026-10-01)
+## Break-face training: no Juglet lead (2026-10-01)
 
-Fine-tuning GARF's placement stage (LoRA adapter, encoder untouched) on breaks whose faces were
-made **rough** or **worn** places more Juglet sherds than the same fine-tune on clean breaks.
-Scored against the conservator's reassembly; a sherd counts as placed within 7% of pot size
-(~4.6 mm on the Juglet).
+Fine-tuning GARF's placement stage (LoRA adapter, encoder untouched) on training breaks made
+**rough** or **worn** looked like it placed more Juglet sherds than clean-break training. It
+does not hold up when the 20 attempts start from different random positions. Scored against
+the conservator's reassembly; a sherd counts as placed within 7% of pot size (~4.6 mm).
 
-- **Juglet, all 20 attempts:** rough 1× ~4.8 and worn 4× ~5.0 sherds per attempt, against ~2.8
-  for clean-break training, at two training runs each. Rough and worn are not distinguishable.
-- **Juglet, best attempt:** worn 4× seated all 9 once (8 of 9 at the second training run);
-  rough 1× 7 of 9 at both; clean-break training 6; released GARF 4. The conservator looked at the
-  9/9 in visual-qa: "all sherds in their sort of correct place … the best result we have so far
-  on TORA or GARF. Not perfect, but a great lead." The look confirms placement, not that the
-  break faces meet.
-- **Eroded pots (8 Fractura pots, 47 sherds):** rough 1×-4× adds 7-9 sherds at heavy erosion
-  (19 → 25-28) where worn adds 2-4. Numbers only: no reassembly from this ladder has been
-  looked at.
-- **Strength is bounded:** 8× already overshoots for both (rough 8× falls to 4/9 on the Juglet),
-  and 16× did not improve on 8×. Training strengths that help are 1×-4×, which is 1-3× rougher
-  or more open than the Juglet's own breaks (~0.17 mm gap).
-- **Retracted:** an apparent cost of every fine-tune on narrow_bottle1 (6 → 2 of 12) came from the
-  random starting positions, not the training. The same pot scored again by the same model gets
-  4-7.
+| Juglet, best of 20 (sherds per attempt, mean of 20) | starting set 42 | set 7 | set 123 |
+|---|---|---|---|
+| released GARF | 4 (2.2) | 3 (1.4) | 3 (1.6) |
+| clean-break fine-tune | 6 (2.1) | 2 (1.2) | 5 (2.7) |
+| rough 1× | 7 (5.2) | 4 (1.9) | 6 (2.9) |
+| worn 4× | **9** (4.7) | 2 (1.3) | 4 (2.3) |
 
-Weight: one real pot, one reference reading, the same 20 starting positions in every run.
-Re-test from two new sets of starting positions is running (GARF jobs 31834501-04). It decides
-whether worn 4× is singled out or whether the lead is "rough or worn training adds ~2 sherds".
+Every earlier run, including the repeat at a second training seed, used starting set 42. On
+that set alone, rough and worn scored well. The conservator's look at the worn 4× 9/9 stands as
+a look at that attempt: placement within ~3.3 mm, every sherd in roughly its place. But it is
+not what the model usually does. On new starts it seats 2-4. Renders: `artifacts/rwlora/jug_arms_redraw.png`.
+On new starts the lower-body sherds are jumbled and the same two (sherds 1 and 2) are swapped in
+most attempts.
 
-This is not a named mechanism. It does not contradict "relief amplitude ruled out". That tested
-whether altering the *test* sherds' relief explained the encoder's blindness. This changes the
-*training* breaks seen by the placement stage. Ticket:
-`.scratch/rough-worn-dose/issues/01-garf-rough-worn-dose-sweep.md`.
+This is **the method failing**, not the ruler: the scores match the pictures, and the GARF and
+own-place scorers agree (0 mismatches). What it rules out: rough or worn training of the
+placement stage alone, at 1×-16×, is not what GARF is missing on the Juglet.
+
+Also retracted: an apparent cost of every fine-tune on narrow_bottle1 (6 → 2 of 12) was the
+starting positions. The gain on eroded Fractura pots (rough 1×-4×, +7-9 of 47 at heavy erosion)
+was measured on starting set 42 only; its re-test is running (jobs 31835231-34).
+
+Ticket: `.scratch/rough-worn-dose/issues/01-garf-rough-worn-dose-sweep.md`.
 
 ## Done when
 

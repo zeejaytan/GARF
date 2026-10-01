@@ -275,3 +275,22 @@ results:
   with no claim for worn 4× specifically.
 - The per-attempt mean (all 20) for rough 1× and worn 4× beats fresh at both seeds → the
   shared rough/worn effect holds independently of the best attempt.
+
+**Redraw results (2026-10-01).** 31834501-04 COMPLETED 0:0 (~6 min each), reconcile 0
+mismatches. Note that the sampling seed also changes the sampled points, not only the starts.
+Juglet best of 20 (attempts) and mean sherds per attempt:
+
+| arm | starts 42 | starts 7 | starts 123 |
+|---|---|---|---|
+| untouched | 4 (2) 2.20 | 3 (2) 1.40 | 3 (3) 1.60 |
+| fresh s42 | 6 (1) 2.10 | 2 (3) 1.15 | 5 (1) 2.65 |
+| rough 1× s42 | 7 (4) 5.15 | 4 (1) 1.90 | 6 (1) 2.85 |
+| worn 4× s42 | 9 (1) 4.65 | 2 (6) 1.30 | 4 (2) 2.30 |
+
+Fractura sum (best of 20 per pot): untouched 39/37/39, fresh 35/36/35, rough 1× 37/40/36,
+worn 4× 37/41/36; narrow_bottle1 alone 2-6. Looked at (`artifacts/rwlora/jug_arms_redraw.png`):
+new-start bests are real pots with the neck placed and the lower body jumbled; sherds 1 and 2
+swapped in most. Pre-registered reading: worn 4× ≤ 7/9 at both new starts → the 9/9 and 8/9 were
+tied to starting set 42. Per-attempt means do not beat fresh at both new starts either (worn
+1.30 vs 1.15 and 2.30 vs 2.65), so the fallback lead "~2 sherds per attempt" also fails.
+**G1 lead withdrawn; recorded as ruled out.** Erosion-ladder redraw: 31835231-34.

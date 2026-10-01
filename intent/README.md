@@ -12,7 +12,7 @@ Prefix **`G`**, permanent. Numbers are never reused. **G5 is next.**
 
 | # | Question | Status | Blocked by |
 |---|---|---|---|
-| [G1](G1-juglet-failure-mechanism.md) | Why does GARF fail on the Juglet? | open — a lead (break-face training), no mechanism named | none |
+| [G1](G1-juglet-failure-mechanism.md) | Why does GARF fail on the Juglet? | open — four mechanisms ruled out, none found | none |
 | [G2](G2-does-piece-count-break-it.md) | Does piece count break it, or is that a coincidence? | open | none |
 | [G3](G3-second-architecture-for-u2.md) | Can GARF be the second architecture that tests U2? | open | [G1](G1-juglet-failure-mechanism.md) |
 | [G4](G4-deploy-without-ground-truth.md) | What can a conservator do with a GARF proposal that has no answer key? | open | `../../intent/U1` |
@@ -27,7 +27,7 @@ Prefix **`G`**, permanent. Numbers are never reused. **G5 is next.**
 | Relief amplitude is **ruled out** as the Juglet mechanism (Exp 7b/9, 2026-07-13), scored on PF++ stand-in mates, not the conservator's reassembly. | 1 object | ibid., second addendum |
 | PF++ pseudo-GT label error is **ruled out** as an explanation of the gap. | 1 object | ibid. |
 | Worn-rim erosion contributes but is **not sufficient**, and rim-oversampling does not remedy it (Exp 7/8, 2026-07-10). | 1 object | ibid., first addendum |
-| Lead: fine-tuning on rough or worn training breaks seats ~2 more Juglet sherds per attempt than clean-break training (best: worn 4× 9/9, looked at by the conservator; rough 1× 7/9 twice); rough 1×-4× adds 7-9 of 47 on heavily eroded Fractura pots (not yet looked at). Redraw pending. | 1 pot + 8 pots, 2 training runs, one set of starting positions | `.scratch/rough-worn-dose/issues/01-garf-rough-worn-dose-sweep.md` |
+| Rough or worn training breaks (LoRA on the placement stage, 1×-16×) do **not** improve GARF on the Juglet. The worn 4× 9/9 came from one set of starting positions; new starts seat 2-4 (2026-10-01). | 1 pot, 3 starting sets, 4 models | `.scratch/rough-worn-dose/issues/01-garf-rough-worn-dose-sweep.md` |
 | Raw scan coordinates put fragments metres apart; the models were trained on a local layout, so anchor-centring on the largest sherd is required before any deploy run. | procedural | `docs/notes/ARCHAEOLOGICAL_DEPLOYMENT.md` |
 
 ## The thing to keep saying out loud
