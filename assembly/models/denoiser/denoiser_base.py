@@ -382,6 +382,14 @@ class DenoiserBase(L.LightningModule):
         return noisy_trans_and_rots, all_steps_preds
 
     def test_step(self, data_dict, idx):
+        # noise_seed reseeds only the starting poses (torch.randn + scipy R.random, which
+        # draws from numpy's global RNG); the presentation (point sample, input
+        # orientation) was already drawn in the loader workers from the eval seed.
+        # Unset = today's behaviour.
+        noise_seed = self.inference_config.get("noise_seed", None)
+        if noise_seed is not None:
+            torch.manual_seed(int(noise_seed) + idx)
+            np.random.seed(int(noise_seed) + idx)
         output_dict = self(data_dict)
         loss_dict, _ = self._loss(data_dict, output_dict)
         self.log_metrics(loss_dict, prefix="test")

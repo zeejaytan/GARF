@@ -18,6 +18,8 @@
 #   sbatch --export=ALL,ARM=fresh slurm/rwlora_arm.slurm   (SEED=7 repeats the training)
 # Redraw only: ADAPTER=output/<exp>/last.ckpt skips training and evaluates that adapter;
 # DRAW_SEEDS="7 123" draws the 20 attempts with each listed sampling seed (default 42).
+# NOISE_SEEDS="1 2 3" reseeds only the starting poses (ticket 03); "none" (default) leaves
+# them tied to the draw seed as before.
 
 set -euo pipefail
 ARM="${ARM:?set ARM}"
@@ -26,6 +28,7 @@ DRAWS="${DRAWS:-20}"
 SEED="${SEED:-42}"   # training seed only
 DRAW_SEEDS="${DRAW_SEEDS:-42}"   # sampling seeds for the 20 attempts
 ADAPTER="${ADAPTER:-}"
+NOISE_SEEDS="${NOISE_SEEDS:-none}"
 cd /data/gpfs/projects/punim2657/GARF
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
@@ -36,7 +39,7 @@ TORA=/data/gpfs/projects/punim2657/TORA/repo
 STAMP="${SLURM_JOB_ID:-local}"
 BASE=output/GARF.ckpt
 
-echo "=== rwlora arm=${ARM} train-seed=${SEED} draw-seeds=${DRAW_SEEDS} adapter=${ADAPTER:-train} sets=${SETS} draws=${DRAWS} $(date) ==="
+echo "=== rwlora arm=${ARM} train-seed=${SEED} draw-seeds=${DRAW_SEEDS} noise-seeds=${NOISE_SEEDS} adapter=${ADAPTER:-train} sets=${SETS} draws=${DRAWS} $(date) ==="
 echo "GPU: $(nvidia-smi --query-gpu=name --format=csv,noheader)"
 echo "GARF $(git rev-parse --short HEAD)"
 
@@ -68,8 +71,10 @@ elif [ "$ARM" != "untouched" ]; then
 fi
 
 for DS_SEED in $DRAW_SEEDS; do
+for NS in $NOISE_SEEDS; do
 for SET in $SETS; do
     TAG=""; [ "$DS_SEED" != 42 ] && TAG="_ds${DS_SEED}"
+    NOISE_ARGS=(); [ "$NS" != none ] && { TAG="${TAG}_ns${NS}"; NOISE_ARGS=("++model.inference_config.noise_seed=$NS"); }
     NAME="rwlora_eval_${ARM}${TAG}_${SET}_${STAMP}"
     python eval.py \
         seed=$DS_SEED experiment=denoiser_flow_matching experiment_name="$NAME" \
@@ -84,7 +89,7 @@ for SET in $SETS; do
         ++model.inference_config.one_step_init=true \
         ++model.inference_config.n_generations=$DRAWS \
         ++model.inference_config.save_clouds=true \
-        ++model.inference_config.save_assembly=false \
+        ++model.inference_config.save_assembly=false "${NOISE_ARGS[@]}" \
         || { echo "eval $SET failed"; exit 1; }
     RUN=$(dirname "$(ls -d logs/rwlora/$NAME/*/clouds | head -1)")
     echo "--- $SET run dir: $RUN ($(ls $RUN/clouds | wc -l) objects)"
@@ -93,6 +98,7 @@ for SET in $SETS; do
     POTMM=(); [ "$SET" = "juglet_gt" ] && POTMM=(--pot-mm 65)
     python $TORA/scripts/own_place.py --run "$RUN" "${POTMM[@]}" --json "$RUN/own_place.json" \
         || echo "own_place failed on $SET (clouds kept; score on CPU)"
+done
 done
 done
 echo "=== done $(date) ==="
