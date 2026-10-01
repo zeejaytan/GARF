@@ -32,7 +32,7 @@ clean-break fine-tune's mean on the same presentation):
 - [ ] Table: model × presentation, Juglet best/mean, Fractura sum; the sign counts above
 - [ ] Best Juglet attempt of the best model rendered beside the conservator's reassembly
       before reporting; worst-presentation attempt rendered too
-- [ ] G1 updated with the result and the date
+- [x] G1 updated with the result and the date (2026-10-01, after refute ws0p6g61l: 0 refuted, 4 narrowed, 1 stands)
 
 ## Results (2026-10-01)
 
@@ -80,4 +80,4 @@ on presentation 7 every model places the neck and jumbles the lower body. Render
 this read-out.
 
 - [x] run, sacct recorded · [x] reconcile 0 · [x] table and sign counts · [x] rendered
-- [ ] G1 updated (pending refute-finding)
+- [x] G1 updated (2026-10-01, wording narrowed per refute)

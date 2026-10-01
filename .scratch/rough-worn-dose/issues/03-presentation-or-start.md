@@ -30,7 +30,7 @@ Readings, fixed before results:
       01's worn 4× Juglet counts exactly)
 - [ ] Both arms run, sacct State/ExitCode recorded, reconcile 0 mismatches
 - [ ] Table of means and bests per arm; render of the deciding comparison before reporting
-- [ ] G1 updated with the result and the date
+- [x] G1 updated with the result and the date (2026-10-01, after refute ws0p6g61l: 0 refuted, 4 narrowed, 1 stands)
 
 ## Results (2026-10-01)
 
@@ -69,4 +69,4 @@ repeatable on the same machine, and machines can differ by a few sherds on a few
 - [x] Table
 - [ ] Render of the deciding comparison: what differs between presentations 42 and 7 on the
       lower-body sherds (sampled points vs input orientation)
-- [ ] G1 updated
+- [x] G1 updated (2026-10-01)

@@ -1,6 +1,6 @@
 # G1 — Why does GARF fail on the Juglet?
 
-**Status:** open — three mechanisms ruled out; break-face training gives no large effect; none found · **Blocked by:** none
+**Status:** open — three mechanisms ruled out; rough break-face training a small gain, presentation dominates; none found · **Blocked by:** none
 **Effort:** the investigation is largely done; what remains is a decision about how much
 more to spend
 
@@ -36,41 +36,61 @@ the untouched model (3), but that fine-tune also damaged placement on its own ch
 vessels and on an unworn pot (galli_pot 8 → 2 of 10).
 So U10 does **not** narrow this question toward the break edges. It is not a GARF result.
 
-## Break-face training: no large effect on the Juglet (2026-10-01)
+## Break-face training: a small gain for one rough adapter; presentation dominates (2026-10-01)
 
 Fine-tuning GARF's placement stage (LoRA adapter, encoder untouched) on training breaks made
-**rough** or **worn** looked like it placed more Juglet sherds than clean-break training. It
-does not hold up when the 20 attempts start from different random positions. Scored against
-the conservator's reassembly; a sherd counts as placed within 7% of pot size (~4.6 mm).
+**rough** or **worn** instead of clean. Scored against the conservator's reassembly; a sherd
+counts as placed within 7% of pot size (~4.6 mm). The largest sherd is pinned at its true
+place and always counts, so the contest is over the other 8.
 
-| Juglet, best of 20 (sherds per attempt, mean of 20) | starting set 42 | set 7 | set 123 |
-|---|---|---|---|
-| released GARF | 4 (2.2) | 3 (1.4) | 3 (1.6) |
-| clean-break fine-tune | 6 (2.1) | 2 (1.2) | 5 (2.7) |
-| rough 1× | 7 (5.2) | 4 (1.9) | 6 (2.9) |
-| worn 4× | **9** (4.7) | 2 (1.3) | 4 (2.3) |
+**What the model is handed matters far more than how it was trained.** A *presentation* is the
+surface points sampled from each sherd and the orientation it is handed in. The same worn 4×
+adapter seats 4.65 of 9 per attempt on one presentation and 1.20 on another; new random
+starting positions on a fixed presentation move it by 0.15 at most (ticket 03). Across ten
+presentations, every model's mean ranges over 4-6 sherds.
 
-Every earlier run, including the repeat at a second training seed, used starting set 42. On
-that set alone, rough and worn scored well. The conservator's look at the worn 4× 9/9 stands as
-a look at that attempt: placement within ~3.3 mm, every sherd in roughly its place. But it is
-not what the model usually does. On new starts it seats 2-4. Renders: `artifacts/rwlora/jug_arms_redraw.png`.
-On new starts the lower-body sherds are jumbled and the same two (sherds 1 and 2) are swapped in
-most attempts.
+**Juglet, ten presentations × 20 attempts, paired** (ticket 02, jobs 31835633-36):
 
-This is **the method failing**, not the ruler: the scores match the pictures, and the GARF and
-own-place scorers agree (0 mismatches). What it rules out: a **large** effect. Rough or worn
-training of the placement stage does not turn GARF into a reliable Juglet assembler. A small
-effect for rough 1× (ahead of clean-break training on all three presentations, by 0.2-3 sherds
-per attempt) is neither shown nor ruled out. Three presentations are too few, because results
-vary far more between presentations than between the 20 attempts within one. A presentation
-is the surface points sampled from each sherd and the orientation it is handed in. Being
-tested: ticket 02 (10 presentations), ticket 03 (presentation or starts).
+| | released GARF | clean-break | rough 1× | worn 4× |
+|---|---|---|---|---|
+| sherds per attempt, mean of 10 presentations (incl. pinned) | 2.04 | 2.46 | 3.87 | 3.54 |
+| above clean-break | 4/10 (not paired: different point sample) | — | 9/10, smallest win +0.5 | 9/10, two wins of +0.15 / +0.20 |
+| best attempt | 6/9 | 8/9 | 9/9 (5 of 200, presentations 1 and 4) | 9/9 (5 of 200, presentations 1 and 4) |
 
-Also retracted: an apparent cost of every fine-tune on narrow_bottle1 (6 → 2 of 12) was the
-starting positions. The gain on eroded Fractura pots (rough 1×-4×, +7-9 of 47 at heavy erosion)
-was measured on starting set 42 only; its re-test is running (jobs 31835231-34).
+- **Rough 1× beats clean-break on the Juglet** — about 1.4 more sherds per attempt, of 8
+  that can move; it still wins 7 of 8 with the two 9/9 presentations removed. This is a
+  **small** effect by the rule fixed before the run, not a reliable assembler.
+- **Worn 4× is borderline.** Two of its nine wins are no bigger than the 0.15-sherd difference
+  between GPU nodes, and the clean-break and worn jobs ran on different nodes (gpgpu111,
+  gpgpu122). Counting only clear wins it is 8/10, which the rule calls inconclusive.
+- **Clean-break fine-tuning alone does nothing** (above released GARF on 4/10).
+- **The conservator's worn 4× 9/9** needed both a favourable presentation (42) and those
+  particular starting positions: three new sets of starts on the same presentation gave a
+  best of 7, 8 and 7.
+- **Fractura gains sit on two pots.** Five of the eight pots are fully reassembled by every
+  model. The gain is narrow_bottle1 (known to swing by up to 5 sherds with the presentation
+  alone) and narrow_bottle3; narrow_bottle3 on its own is above clean-break on 8/10 (rough)
+  and 9/10 (worn). The erosion ladder (same 8 pots, eroded) favours rough at heavy erosion on
+  all 3 presentations tried, +7 to +11 of 47; no render of that gain exists yet.
 
-Ticket: `.scratch/rough-worn-dose/issues/01-garf-rough-worn-dose-sweep.md`.
+**How much weight this bears:** one pot, and **one trained adapter per arm** — the ten
+presentations repeat the scoring, not the training. Rough 1× and worn 4× were each the best
+of six strengths on presentation 42; clean-break was not picked from a field. So what is
+shown is "this rough adapter beats this clean-break adapter", not "rough training helps".
+The repeat training (seed 7) was scored on presentation 42 only.
+
+This is **the method**, not the ruler or the answer key: a threshold sweep from 3.5% to 14%
+keeps the order, the GARF and own-place scorers agree (0 mismatches in 80 runs), and the
+reference's known faults (sherd 7, 5-11°; joins overlapping 0.2-0.5 mm) do not decide which
+sherds the arms gain. Checked by a five-skeptic refute (0 refuted, 4 narrowed, 1 stands).
+
+**What would earn "rough training helps":** the seed-7 adapters over the same ten
+presentations, on one GPU node, beating seed-7 clean-break on ≥9/10 by more than 0.15 sherd.
+**Not yet looked at:** a typical (not best) attempt of rough vs clean-break, close on the lower
+body; the presentation-42 vs presentation-7 comparison (ticket 03).
+
+Tickets: `.scratch/rough-worn-dose/issues/01`-`03`. Renders: `artifacts/rwlora/jug_t02.png`
+(best attempts only), `jug_arms_redraw.png`.
 
 ## Done when
 
