@@ -294,3 +294,19 @@ swapped in most. Pre-registered reading: worn 4× ≤ 7/9 at both new starts →
 tied to starting set 42. Per-attempt means do not beat fresh at both new starts either (worn
 1.30 vs 1.15 and 2.30 vs 2.65), so the fallback lead "~2 sherds per attempt" also fails.
 **G1 lead withdrawn; recorded as ruled out.** Erosion-ladder redraw: 31835231-34.
+
+**Ladder redraw (2026-10-01).** 31835231-34 COMPLETED 0:0 (~24 min), reconcile 0 mismatches.
+Sum over 8 pots of best of 20 (of 47), presentations 42 / 7 / 123:
+
+| erosion | released | clean-break | rough 1× | worn 4× |
+|---|---|---|---|---|
+| e000 | 39/38/39 | 38/41/37 | 41/39/39 | 40/44/40 |
+| e025 | 38/34/32 | 36/38/34 | 39/42/36 | 39/41/40 |
+| e050 | 36/32/34 | 34/34/36 | 40/35/40 | 38/36/39 |
+| e075 | 23/28/22 | 25/22/27 | 32/33/36 | 30/31/32 |
+| e100 | 21/15/21 | 19/19/19 | 26/26/26 | 21/22/25 |
+
+On the two most eroded rungs rough 1× is ahead of clean-break on all three presentations
+(+5 to +11 sherds of 47). **Superseded:** the "G1 lead withdrawn" above rested on three
+presentations; ticket 02's ten reverse it for the shared rough/worn effect (not for worn 4×'s
+9/9 specifically).
