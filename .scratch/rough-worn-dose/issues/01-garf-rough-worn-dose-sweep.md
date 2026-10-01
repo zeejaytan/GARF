@@ -237,7 +237,9 @@ training is a TORA quirk.
 - [x] Damage gate — failed, and confirmed at seed 7 (narrow_bottle1 6 → 2 of 12 both seeds);
       overridden by the conservator: arms judged against retrained GARF
 - [x] 13 arms trained and evaluated; best-of-20 table (2026-09-29, Results above); beside TORA's below
-- [ ] Best attempts staged for the conservator — worn 4× Juglet (9/9) staged 2026-09-29 as
+- [x] Best attempts staged for the conservator — worn 4× Juglet (9/9) staged 2026-09-29 as
       `garf_juglet_worn4x_rw01` (surface coincidence median 0.28 mm; gates check_annotations,
       check_stage_pair OK; check_loader / check_mesh_loader fail on their own missing fixtures,
-      as since 2026-09-26). Awaiting the conservator's look; other arms not staged
+      as since 2026-09-26). Conservator's look (2026-10-01): "a good attempt, all sherds are in
+      their sort of correct place; the best result we have so far on TORA or GARF. Not perfect,
+      but a great lead." Other arms not staged
