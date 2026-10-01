@@ -16,12 +16,16 @@
 # pose, scored by TORA's own_place on the pot-size ruler, plus the GARF<->own_place
 # reconcile gate. SETS overrides the test sets (default all three).
 #   sbatch --export=ALL,ARM=fresh slurm/rwlora_arm.slurm   (SEED=7 repeats the training)
+# Redraw only: ADAPTER=output/<exp>/last.ckpt skips training and evaluates that adapter;
+# DRAW_SEEDS="7 123" draws the 20 attempts with each listed sampling seed (default 42).
 
 set -euo pipefail
 ARM="${ARM:?set ARM}"
 SETS="${SETS:-juglet_gt fractura_fresh erosion_ceramics}"
 DRAWS="${DRAWS:-20}"
-SEED="${SEED:-42}"   # training seed only; the 20 attempts are always drawn with seed 42
+SEED="${SEED:-42}"   # training seed only
+DRAW_SEEDS="${DRAW_SEEDS:-42}"   # sampling seeds for the 20 attempts
+ADAPTER="${ADAPTER:-}"
 cd /data/gpfs/projects/punim2657/GARF
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
@@ -32,12 +36,15 @@ TORA=/data/gpfs/projects/punim2657/TORA/repo
 STAMP="${SLURM_JOB_ID:-local}"
 BASE=output/GARF.ckpt
 
-echo "=== rwlora arm=${ARM} train-seed=${SEED} sets=${SETS} draws=${DRAWS} $(date) ==="
+echo "=== rwlora arm=${ARM} train-seed=${SEED} draw-seeds=${DRAW_SEEDS} adapter=${ADAPTER:-train} sets=${SETS} draws=${DRAWS} $(date) ==="
 echo "GPU: $(nvidia-smi --query-gpu=name --format=csv,noheader)"
 echo "GARF $(git rev-parse --short HEAD)"
 
 LORA_ARGS=()
-if [ "$ARM" != "untouched" ]; then
+if [ -n "$ADAPTER" ]; then
+    ls -la "$ADAPTER"
+    LORA_ARGS=("+lora_ckpt_path=$ADAPTER")
+elif [ "$ARM" != "untouched" ]; then
     EXP="rwlora_${ARM}_s${SEED}_${STAMP}"
     if [ "$ARM" = "fresh" ]; then
         DATA=(data.data_root=$DS/u10_generic.hdf5 "data.categories=[u10_generic,u10_ceiling]"
@@ -60,10 +67,12 @@ if [ "$ARM" != "untouched" ]; then
     LORA_ARGS=("+lora_ckpt_path=$ADAPTER")
 fi
 
+for DS_SEED in $DRAW_SEEDS; do
 for SET in $SETS; do
-    NAME="rwlora_eval_${ARM}_${SET}_${STAMP}"
+    TAG=""; [ "$DS_SEED" != 42 ] && TAG="_ds${DS_SEED}"
+    NAME="rwlora_eval_${ARM}${TAG}_${SET}_${STAMP}"
     python eval.py \
-        seed=42 experiment=denoiser_flow_matching experiment_name="$NAME" \
+        seed=$DS_SEED experiment=denoiser_flow_matching experiment_name="$NAME" \
         loggers=csv loggers.csv.save_dir=logs/rwlora \
         trainer.num_nodes=1 trainer.devices=1 trainer.precision=bf16-mixed \
         data.data_root=$DS/$SET.hdf5 "data.categories=['$SET']" \
@@ -84,5 +93,6 @@ for SET in $SETS; do
     POTMM=(); [ "$SET" = "juglet_gt" ] && POTMM=(--pot-mm 65)
     python $TORA/scripts/own_place.py --run "$RUN" "${POTMM[@]}" --json "$RUN/own_place.json" \
         || echo "own_place failed on $SET (clouds kept; score on CPU)"
+done
 done
 echo "=== done $(date) ==="

@@ -243,3 +243,35 @@ training is a TORA quirk.
       as since 2026-09-26). Conservator's look (2026-10-01): "a good attempt, all sherds are in
       their sort of correct place; the best result we have so far on TORA or GARF. Not perfect,
       but a great lead." Other arms not staged
+
+## Refute-finding (2026-10-01): 0 refuted, 4 weakened, 1 stands
+
+Workflow wf_7a465bb4-68e on the proposed G1 lead. Reference lens: stands (Juglet scored
+against the conservator's reassembly; GARF's reference cloud sits on it, median 0.21 mm).
+Weakened, and what was done about each:
+- **Measurement + trail: part (d) was the draws, not the fine-tune.** `fractura_fresh` is a
+  copy of the ladder's `_e000` rung, so every arm scores the same 8 pots twice. Checked per pot
+  (`logs/rwlora/rw_e000.py`, no GPU): narrow_bottle1 is 2 of 12 on fractura_fresh but 4-7 of
+  12 on e000 in every fine-tuned arm (fresh s42 4, fresh s7 6, worn 4× 6, worn 8× 7); released
+  GARF 6 on both. Same model, same pot, different starting draws. **The narrow_bottle1
+  "damage" is retracted**; a single pot's best of 20 moves by up to 5 sherds with the draws.
+- **Weight:** over all 20 attempts, worn 4× seats more Juglet sherds than fresh at both seeds
+  (4.65 and 5.35 vs ~2.8 per attempt), but is not separable from rough 1× (5.0 vs 4.8 pooled).
+  The 9/9 is one attempt of 40.
+- **Eye:** the look confirmed placement (within ~4.6 mm), not that break faces meet;
+  the ladder gain has no render.
+- **Trail:** TORA's worn 4× was not retired because seed 7 fell back. It held at seed 7, and
+  was retired for trailing rough 1× and never moving the ladder. Line in the follow-up above
+  corrected by this note.
+
+**Redraw (no retraining).** Every arm drew its 20 attempts with sampling seed 42. A new
+training seed did not test the draws. `rwlora_arm.slurm` now takes `ADAPTER=` (evaluate an
+existing adapter) and `DRAW_SEEDS=`. Untouched, fresh s42, rough 1× s42 and worn 4× s42 are
+re-evaluated on the Juglet and Fractura at sampling seeds 7 and 123. Readings, fixed before
+results:
+- Worn 4× ≥ 8/9 on the Juglet at both new draw seeds while fresh stays ≤ 6/9 → the lead holds
+  across draws. Worn 4× ≤ 7/9 at either seed → the 9/9 and 8/9 were tied to seed-42 draws;
+  the G1 lead becomes "rough or worn break-face training lifts GARF by ~2 sherds per attempt",
+  with no claim for worn 4× specifically.
+- The per-attempt mean (all 20) for rough 1× and worn 4× beats fresh at both seeds → the
+  shared rough/worn effect holds independently of the best attempt.
