@@ -1,6 +1,6 @@
 # G1 — Why does GARF fail on the Juglet?
 
-**Status:** open — four mechanisms ruled out, none found · **Blocked by:** none
+**Status:** open — three mechanisms ruled out; break-face training gives no large effect; none found · **Blocked by:** none
 **Effort:** the investigation is largely done; what remains is a decision about how much
 more to spend
 
@@ -36,7 +36,7 @@ the untouched model (3), but that fine-tune also damaged placement on its own ch
 vessels and on an unworn pot (galli_pot 8 → 2 of 10).
 So U10 does **not** narrow this question toward the break edges. It is not a GARF result.
 
-## Break-face training: no Juglet lead (2026-10-01)
+## Break-face training: no large effect on the Juglet (2026-10-01)
 
 Fine-tuning GARF's placement stage (LoRA adapter, encoder untouched) on training breaks made
 **rough** or **worn** looked like it placed more Juglet sherds than clean-break training. It
@@ -58,8 +58,13 @@ On new starts the lower-body sherds are jumbled and the same two (sherds 1 and 2
 most attempts.
 
 This is **the method failing**, not the ruler: the scores match the pictures, and the GARF and
-own-place scorers agree (0 mismatches). What it rules out: rough or worn training of the
-placement stage alone, at 1×-16×, is not what GARF is missing on the Juglet.
+own-place scorers agree (0 mismatches). What it rules out: a **large** effect. Rough or worn
+training of the placement stage does not turn GARF into a reliable Juglet assembler. A small
+effect for rough 1× (ahead of clean-break training on all three presentations, by 0.2-3 sherds
+per attempt) is neither shown nor ruled out. Three presentations are too few, because results
+vary far more between presentations than between the 20 attempts within one. A presentation
+is the surface points sampled from each sherd and the orientation it is handed in. Being
+tested: ticket 02 (10 presentations), ticket 03 (presentation or starts).
 
 Also retracted: an apparent cost of every fine-tune on narrow_bottle1 (6 → 2 of 12) was the
 starting positions. The gain on eroded Fractura pots (rough 1×-4×, +7-9 of 47 at heavy erosion)
