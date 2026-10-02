@@ -93,8 +93,14 @@ read **inconclusive** by the rule, so the claim stays "this adapter beats that o
 training runs rough is ahead on 17 of 20 presentations, worn on 19 of 20. The node worry is
 retired for these runs: the seed-42 scores came back identical on a third node.
 The typical (not best) attempt has been looked at (`jug_t05.png`, coloured by mm from home) and
-agrees with the counts. **Not yet looked at:** the presentation-42 vs presentation-7 comparison
-(ticket 03).
+agrees with the counts. **Presentation 42 vs 7 (2026-10-02, ticket 03):** how the surface points are sampled does
+not explain it: every presentation puts nearly the same share of points on the join edges
+(rank correlation with score +0.25, p 0.44, 12 presentations), and the face-on render shows
+no bare edge on presentation 7. The untested half of a presentation is the random turn each
+sherd is handed in; separating it needs a run with points fixed and turns re-drawn.
+**Sherds 1 and 2 (ticket 04):** not a look-alike pair. Their exchange is the most frequent of
+any pair but not clearly (29 vs 22 and 20 in 1,400 attempts); sherd 2 is simply the sherd
+that most often lands in another's home.
 
 **Full reassembly, scored the right way round (2026-10-02, ticket 06).** The own-place count was
 **broken for turned sherds** (measurement broken, not method): a sherd spun half a turn on its own

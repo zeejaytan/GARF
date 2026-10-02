@@ -11,13 +11,16 @@ a person might also face.
 **Answers:** G1 (a named, measurable candidate: look-alike sherds whose break edges do not
 tell them apart. It is testable on a second object by finding a look-alike pair there)
 **Blocked by:** None (can start immediately)
-**Status:** ready-for-agent
-**Needs-eye:** a visual-qa pair of sherds 1 and 2 side by side, and one swapped attempt
-beside the conservator's reassembly; stage via `visual-qa/viewer/stage_pair.py` (desc not yet written)
+**Status:** done
+Eye (not reached): the staging step was conditional on step 1, which stopped the ticket.
 
-- [ ] Count every swapped pair across all saved Juglet attempts. **Stop here** with one line
-      in G1 if 1-2 is not clearly the most frequent swap
-- [ ] Measure both sherds: area, longest dimension, wall curvature, break-edge length, in mm
-- [ ] Stage the pair; the conservator says whether they could be told apart by hand, and how
-- [ ] Look-alikes → write the candidate into G1 with the measurement that defines it. Not
-      look-alikes → one line in G1 saying the swap is not a shape ambiguity
+- [x] Count every swapped pair across all saved Juglet attempts. **Stopped here** (2026-10-02):
+      1-2 is the most frequent but not clearly. Over 1,400 attempts (7 models × 10
+      presentations × 20): sherds exchanged both ways 1↔2 29, 4↔6 22, 1↔7 20, 3↔8 17; either
+      direction 1-2 355, 2-3 311, 3-8 289. On presentation 42 alone (140 attempts) 1↔2 is 3,
+      behind 3↔8 at 6. The 1-2 events are mostly one way: sherd 2 on sherd 1's home (286),
+      not a swap. Sherd 2 is the sherd that wanders most (in another's home 770 times; next
+      sherd 5, 526). Not a look-alike pair by this test. `artifacts/rwlora/jug_t04_swaps.json`
+- [ ] ~~Measure both sherds: area, longest dimension, wall curvature, break-edge length, in mm~~ (not reached)
+- [ ] ~~Stage the pair; the conservator says whether they could be told apart by hand, and how~~ (not reached)
+- [x] One line in G1: the 1-2 swap is not a stand-out, so no look-alike candidate (2026-10-02)

@@ -16,7 +16,7 @@ fine-tune on the Juglet in two arms:
 **Answers:** G1 (if the Juglet result depends mainly on how the sherds are sampled and
 presented, that sensitivity is itself a candidate mechanism, measurable on a second object)
 **Blocked by:** None (can start immediately; independent of 02)
-**Status:** ready-for-agent
+**Status:** done
 
 Readings, fixed before results:
 - Presentation 42 fixed and new starts keep worn 4× near its old mean (≥ 4 sherds per
@@ -67,6 +67,26 @@ repeatable on the same machine, and machines can differ by a few sherds on a few
 - [x] Knob added, default unchanged (worn 4× bit-identical; clean-break identical per node)
 - [x] Both arms run, sacct recorded, reconcile 0
 - [x] Table
-- [ ] Render of the deciding comparison: what differs between presentations 42 and 7 on the
-      lower-body sherds (sampled points vs input orientation)
+- [x] Render of the deciding comparison (2026-10-02): `artifacts/rwlora/jug_t03_pres42_vs_7.png`
+
+## Presentation 42 vs 7: sampled points (2026-10-02)
+
+A presentation is two random draws: which surface points are sampled on each sherd, and a
+random turn applied to each sherd before GARF sees it (`rotate_pc`, weighted.py `transform`).
+Only the points are saved; the turns are not, so only the first can be tested on the laptop.
+
+Test: share of each sherd's points within 1.5 mm of a neighbouring sherd (points sit ~1.05 mm
+apart, so this is the join-edge band), all 12 presentations, against worn 4× mean per attempt.
+- The share barely moves between presentations: within 1-10 percentage points per sherd
+  (e.g. sherd 4: 23-27%, sherd 8: 46-56%).
+- It does not follow the score: rank correlation over the 8 movable sherds +0.25 (p 0.44);
+  the strongest single sherd, 7, +0.56 (p 0.06), one of 8 tested, chance level.
+- Render (face-on, mm, grey points / red join-band points), lower-body sherds 3, 4, 5, 6, 8:
+  both presentations cover every edge evenly; no bare edge on presentation 7. Sherds 3 and 4
+  have identical join counts on both.
+
+Reading: **how the points are sampled does not explain why presentation 42 works and 7 does
+not.** The untested half is the random turn each sherd is handed in. Separating it needs a
+run with the sampled points held fixed and only the turns re-drawn (GPU, not yet decided).
+Script: scratchpad `t03_joins.py`, numbers `artifacts/rwlora/jug_t03_joins.json`.
 - [x] G1 updated (2026-10-01)
