@@ -84,13 +84,19 @@ keeps the order, the GARF and own-place scorers agree (0 mismatches in 80 runs),
 reference's known faults (sherd 7, 5-11°; joins overlapping 0.2-0.5 mm) do not decide which
 sherds the arms gain. Checked by a five-skeptic refute (0 refuted, 4 narrowed, 1 stands).
 
-**What would earn "rough training helps":** the seed-7 adapters over the same ten
-presentations, on one GPU node, beating seed-7 clean-break on ≥9/10 by more than 0.15 sherd.
-**Not yet looked at:** a typical (not best) attempt of rough vs clean-break, close on the lower
-body; the presentation-42 vs presentation-7 comparison (ticket 03).
+**Second training run (seed 7, one GPU node, 2026-10-02, ticket 05):** the direction repeats
+but does not clear the bar fixed beforehand (≥9/10 by more than 0.15). Rough is ahead of
+clean-break on 8/10 (+0.84 per attempt); worn on 10/10 but by more than 0.15 on only 8. Both
+read **inconclusive** by the rule, so the claim stays "this adapter beats that one". Across both
+training runs rough is ahead on 17 of 20 presentations, worn on 19 of 20. The node worry is
+retired for these runs: the seed-42 scores came back identical on a third node.
+The typical (not best) attempt has been looked at (`jug_t05.png`, coloured by mm from home) and
+agrees with the counts. **Not yet looked at:** the presentation-42 vs presentation-7 comparison
+(ticket 03). **Open caveat on the ruler:** own_place counts a sherd that is in place but turned
+as home; this flatters clean-break most (19 of its 43 home sherds on two presentations).
 
-Tickets: `.scratch/rough-worn-dose/issues/01`-`03`. Renders: `artifacts/rwlora/jug_t02.png`
-(best attempts only), `jug_arms_redraw.png`.
+Tickets: `.scratch/rough-worn-dose/issues/01`-`05`. Renders: `artifacts/rwlora/jug_t02.png`
+(best attempts only), `jug_t05.png` (typical attempts, mm from home), `jug_arms_redraw.png`.
 
 ## Done when
 

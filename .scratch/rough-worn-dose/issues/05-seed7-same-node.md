@@ -24,9 +24,48 @@ mean of 20, per presentation:
   ticket-02 count becomes 7/10 and worn is written as no shown effect.
 - Fractura reported per pot (narrow_bottle1 and narrow_bottle3 are the only pots that move).
 
-- [ ] Job submitted, polled, final sacct State/ExitCode recorded; node recorded
-- [ ] Reconcile 0 mismatches in every run
-- [ ] Table + sign counts against the rule above
-- [ ] G1 updated with the result and the date
+- [x] Job submitted, polled, final sacct State/ExitCode recorded; node recorded (31939551, COMPLETED 0:0, 1h41, spartan-gpgpu107; laptop poll hit its 2 h cap, state read from sacct)
+- [x] Reconcile 0 mismatches in every run (66 runs)
+- [x] Table + sign counts against the rule above
+- [x] G1 updated with the result and the date (2026-10-02)
 
 Script: `slurm/rwlora_same_node.slurm` (calls `slurm/rwlora_arm.slurm` per arm).
+
+## Results (2026-10-02)
+
+Juglet, sherds per attempt (mean of 20, pinned sherd included), seed-7 adapters, one node:
+
+| presentation | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | mean | best |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| clean-break s7 | 5.30 | 3.90 | 3.30 | 2.90 | 2.55 | 2.35 | 1.25 | 2.50 | 1.20 | 1.80 | 2.71 | 8/9 |
+| rough 1× s7 | 6.55 | 3.90 | 5.00 | 5.35 | 3.35 | 3.25 | 1.85 | 2.70 | 1.95 | 1.55 | 3.55 | 9/9 (3 of 200) |
+| worn 4× s7 | 7.10 | 4.15 | 5.05 | 6.70 | 3.55 | 2.55 | 1.40 | 2.75 | 1.35 | 2.20 | 3.68 | 9/9 (8 of 200) |
+
+- Rough s7 − clean s7: +1.25 0 +1.70 +2.45 +0.80 +0.90 +0.60 +0.20 +0.75 −0.25 → **8/10 by more
+  than 0.15 → inconclusive** by the rule. Mean +0.84 (seed 42: +1.41).
+- Worn s7 − clean s7: +1.80 +0.25 +1.75 +3.80 +1.00 +0.20 +0.15 +0.25 +0.15 +0.40 → above on
+  **10/10**, never below, but two wins are exactly 0.15, so **8/10 by the rule → inconclusive**.
+  Mean +0.97 (seed 42: +1.08).
+- Seed-42 re-score on gpgpu107, presentations 7/9/10: clean 1.15/1.45/2.35, worn 1.30/1.65/2.30 —
+  **identical to ticket 02** (gpgpu111/gpgpu122). The node did not move these runs; worn is ahead
+  on both 7 and 9, so its ticket-02 count stays 9/10 (by +0.15 and +0.20, i.e. 3-4 more sherds
+  over 20 attempts).
+- Fractura (sum over 20 attempts, per presentation, vs clean s7): narrow_bottle1 rough above 8/10,
+  worn 10/10; narrow_bottle3 rough 8/10, worn 8/10. The other pots do not move.
+- Across both training runs: rough ahead of clean-break on 17 of 20 (training run × presentation),
+  worn on 19 of 20.
+
+Reading: the direction **replicates in a second training run** for both rough and worn, at about
+two-thirds the size for rough; neither clears the strict bar fixed beforehand. G1 keeps "one
+adapter beats one adapter" wording per the rule, with this line added.
+
+Render: `artifacts/rwlora/jug_t05.png` — the attempt nearest each model's mean (not the best),
+presentations 4 and 7, each point coloured by its distance from home in mm. Agrees with the
+counts: on presentation 4 worn's typical attempt has the lower body mostly within 4 mm, rough's
+partly, clean-break's not; on presentation 7 every model's lower body is 20-30 mm off.
+
+**Found while rendering (not part of the rule):** own_place counts a sherd home by where its
+points sit, not which way it faces. On presentations 4 and 7, sherds scored home but whose points
+are a median >4.6 mm from home (in place but turned): clean-break 19 of 43, rough 23 of 104,
+worn 30 of 122. A stricter, orientation-aware count would widen the gap, not close it; two
+presentations only. Worth its own ticket before any orientation-aware ruler is used.
