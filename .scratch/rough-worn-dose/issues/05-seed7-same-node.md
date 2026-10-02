@@ -69,3 +69,30 @@ points sit, not which way it faces. On presentations 4 and 7, sherds scored home
 are a median >4.6 mm from home (in place but turned): clean-break 19 of 43, rough 23 of 104,
 worn 30 of 122. A stricter, orientation-aware count would widen the gap, not close it; two
 presentations only. Worth its own ticket before any orientation-aware ruler is used.
+
+## Full reassembly, own vs orientation-aware (2026-10-02, all 1,400 saved Juglet attempts)
+
+Strict = own AND the sherd's points sit a median <4.6 mm from home (pred/gt points correspond
+one-to-one; mm = 65 / longest gt box side). Per arm, 200 attempts (10 presentations × 20 starts).
+
+| arm | own 9/9 | own ≥8 | own ≥7 | strict 9/9 | strict ≥8 | strict ≥7 | mean own | mean strict |
+|---|---|---|---|---|---|---|---|---|
+| released s42 | 0 | 0 | 0 | 0 | 0 | 0 | 2.04 | 1.30 |
+| clean s42 | 0 | 2 | 5 | 0 | 0 | 0 | 2.46 | 1.64 |
+| rough s42 | 5 | 15 | 35 | 1 | 2 | 6 | 3.87 | 2.56 |
+| worn s42 | 5 | 12 | 21 | 0 | 2 | 5 | 3.54 | 2.46 |
+| clean s7 | 0 | 2 | 3 | 0 | 0 | 0 | 2.71 | 1.72 |
+| rough s7 | 3 | 13 | 20 | 0 | 1 | 7 | 3.54 | 2.44 |
+| worn s7 | 8 | 15 | 27 | 1 | 2 | 10 | 3.68 | 2.60 |
+
+- Of 21 own-scored 9/9s, **2 are genuine** (rough s42 presentation 1 #19: every sherd ≤13°,
+  ≤2 mm; worn s7 presentation 4 #11: max 17°, ≤3.9 mm). The rest have sherd 7 (or 8) spun
+  170-179° about its own face normal (centroid ≤2.4 mm, chamfer 1.2 mm, pointwise median
+  15.7 mm), or sherds 2/4/5 turned 28-46°.
+- The 9/9 the conservator saw (`visual-qa/viewer/pairs/garf_juglet_worn4x_rw01.json`, seed-42
+  worn, presentation 42, attempt 5): per-sherd turns 0/27/17/143/25/169/19/179/60° — sherds 3,
+  5, 7 spun half a turn. **Not a genuine reassembly. Measurement broken, not method.**
+- Near-complete, strict, both training runs: clean-break 0/400 at ≥7, rough 13/400, worn 15/400.
+- Render: `artifacts/rwlora/sherd7_flip.png` (face-on, home vs placed, coloured by home height).
+- Literature part accuracy (chamfer <0.01) has the same blind spot; no reassembly paper found
+  that reports an all-sherds-correct rate (paper-reader, 2026-10-02).
