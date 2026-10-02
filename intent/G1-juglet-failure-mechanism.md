@@ -114,9 +114,11 @@ same blind spot. A sherd now also has to sit the right way round: its points a m
   from the same start (0.2-2.1 mm apart), so the second training run is a weak repeat, not an
   independent one. Five-skeptic refute (wf_21ba12d0-63c): 0 refuted, 4 narrowed, 1 stands; the
   wording here carries the narrowing.
-- **Eye pending:** a spun "9 of 9" beside a genuine one is staged in visual-qa
-  (`garf_juglet_spun_t06`, `garf_juglet_genuine_t06`); the conservator's note decides whether
-  this ruler matches what a conservator calls reassembled.
+- **Witnessed (2026-10-02):** a spun "9 of 9" beside a genuine one in visual-qa
+  (`garf_juglet_spun_t06`, `garf_juglet_genuine_t06`). The conservator confirmed the spun
+  sherd is wrong once told which it was (a blind first look passed both), so right way round
+  matches what a conservator calls reassembled. Own place stays reported beside it as "the
+  vessel's shape reads, sherds need manual adjustment".
 
 Tickets: `.scratch/rough-worn-dose/issues/01`-`06`. Renders: `artifacts/rwlora/jug_t02.png`
 (best attempts only), `jug_t05.png` (typical attempts, mm from home), `jug_arms_redraw.png`.

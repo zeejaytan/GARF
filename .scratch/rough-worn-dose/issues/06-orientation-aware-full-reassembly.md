@@ -11,7 +11,7 @@ beside it, reported as the best of N with how many attempts reached it.
 
 **Blocked by:** 05 (done)
 
-**Status:** ready-for-agent
+**Status:** done
 
 **Needs-eye:** a spun-sherd "9/9" beside a genuine 9/9, staged in visual-qa; the conservator's
 note decides whether the new count matches what a conservator calls reassembled.
@@ -35,7 +35,7 @@ The rule, fixed before re-scoring:
       `scripts/test_own_place.py` all pass, 2026-10-02)
 - [x] Re-score of all 1,400 saved attempts matches ticket 05's table (two genuine 9/9s)
       (`artifacts/rwlora/jug_t06_rescore.json`; identical counts, rough s42 mean 2.55)
-- [ ] visual-qa pairs staged (done 2026-10-02: `garf_juglet_spun_t06` = "A", worn s42
+- [x] visual-qa pairs staged (done 2026-10-02: `garf_juglet_spun_t06` = "A", worn s42
       presentation 1 attempt 19, sherd 7 turned 174°; `garf_juglet_genuine_t06` = "B", rough
       s42 presentation 1 attempt 19, every sherd ≤13°; surface coincidence 0.22 / 0.19 mm).
       Titles are the same question on purpose, so the eye is not told which is which.
@@ -51,6 +51,11 @@ The rule, fixed before re-scoring:
       unblinded, at its break edges against sherds 6 and 8 and any surface marks: is it the
       right way round? Agreed to keep own place as the second headline number ("vessel shape
       reads, sherds need manual adjustment") beside right way round ("full reassembly").
-      Box stays open until the A sherd-7 question is answered.
+      Witnessed (2026-10-02, second look, told sherd 7 is the pink piece): "yes, i see indeed
+      there is a difference. i missed it first time looking at it, A got the pink piece wrong
+      rotation". Eye and ruler agree: A is not a full reassembly, B is. Reply: right way round
+      stands as the full-reassembly count; own place is kept beside it as the "shape reads,
+      needs manual adjustment" count. Lesson for the viewer: a blind look at the whole pot
+      missed a half-turned sherd; name the sherd (by colour) the ruler flags.
 - [x] Glossary entry and lesson written (umbrella `docs/glossary.md` "own place / right way round", "full reassembly"; `docs/lessons.md` "9 of 9 with three sherds facing the wrong way")
 - [x] G1 updated after refute-finding wf_21ba12d0-63c (0 refuted, 4 narrowed, 1 stands), 2026-10-02
