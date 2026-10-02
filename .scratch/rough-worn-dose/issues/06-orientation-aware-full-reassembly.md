@@ -17,8 +17,9 @@ beside it, reported as the best of N with how many attempts reached it.
 note decides whether the new count matches what a conservator calls reassembled.
 
 Why: the current count (chamfer under tolerance, as in the papers' part accuracy) passes a
-sherd spun half a turn on its own face; 19 of 21 scored 9/9s were like that, including the one
-the conservator saw (ticket 05, last section). Measurement broken, not method.
+sherd spun half a turn on its own face; of 21 scored 9/9s, 14 had a sherd turned 95-179° and 5 a
+sherd tilted 28-44°, and the separate 9/9 the conservator saw had three sherds spun (ticket 05,
+last section). Measurement broken, not method.
 
 The rule, fixed before re-scoring:
 - **Right way round** = own place AND median distance of the sherd's points from their own
@@ -40,4 +41,4 @@ The rule, fixed before re-scoring:
       Titles are the same question on purpose, so the eye is not told which is which.
       Conservator note read back and replied to: pending
 - [x] Glossary entry and lesson written (umbrella `docs/glossary.md` "own place / right way round", "full reassembly"; `docs/lessons.md` "9 of 9 with three sherds facing the wrong way")
-- [ ] G1 updated (after the refute-finding offer)
+- [x] G1 updated after refute-finding wf_21ba12d0-63c (0 refuted, 4 narrowed, 1 stands), 2026-10-02

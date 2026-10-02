@@ -55,8 +55,12 @@ Juglet, sherds per attempt (mean of 20, pinned sherd included), seed-7 adapters,
 - Across both training runs: rough ahead of clean-break on 17 of 20 (training run × presentation),
   worn on 19 of 20.
 
-Reading: the direction **replicates in a second training run** for both rough and worn, at about
-two-thirds the size for rough; neither clears the strict bar fixed beforehand. G1 keeps "one
+Reading: the direction **repeats in a second training run** for both rough and worn, at about
+two-thirds the size for rough; neither clears the strict bar fixed beforehand. Weak repeat: the
+seed-7 and seed-42 worn adapters place sherds almost identically from the same start (median
+0.2-2.1 mm apart on presentation 1, against 1.5-11 mm between worn and clean-break), so the two
+runs are close to one training run seen twice, not independent replicates (refute-finding
+wf_21ba12d0-63c, 2026-10-02). G1 keeps "one
 adapter beats one adapter" wording per the rule, with this line added.
 
 Render: `artifacts/rwlora/jug_t05.png` — the attempt nearest each model's mean (not the best),
@@ -86,13 +90,26 @@ one-to-one; mm = 65 / longest gt box side). Per arm, 200 attempts (10 presentati
 | worn s7 | 8 | 15 | 27 | 1 | 2 | 10 | 3.68 | 2.60 |
 
 - Of 21 own-scored 9/9s, **2 are genuine** (rough s42 presentation 1 #19: every sherd ≤13°,
-  ≤2 mm; worn s7 presentation 4 #11: max 17°, ≤3.9 mm). The rest have sherd 7 (or 8) spun
-  170-179° about its own face normal (centroid ≤2.4 mm, chamfer 1.2 mm, pointwise median
-  15.7 mm), or sherds 2/4/5 turned 28-46°.
-- The 9/9 the conservator saw (`visual-qa/viewer/pairs/garf_juglet_worn4x_rw01.json`, seed-42
+  ≤2.3 mm; worn s7 presentation 4 #11: max 17°, ≤4.45 mm, sherd 4 only 0.15 mm under the
+  line). 14 have a sherd turned 95-179° (13 of them sherd 2, 7 or 8 spun 165-179° about its
+  own face normal: centroid ≤2.4 mm, chamfer 1.2 mm, pointwise median 15.7 mm); 5 have a
+  sherd tilted 28-44° and 6-10 mm off, none spun.
+- The 9/9 the conservator saw is a separate, 22nd attempt, not one of the 21 (`visual-qa/viewer/pairs/garf_juglet_worn4x_rw01.json`, seed-42
   worn, presentation 42, attempt 5): per-sherd turns 0/27/17/143/25/169/19/179/60° — sherds 3,
   5, 7 spun half a turn. **Not a genuine reassembly. Measurement broken, not method.**
 - Near-complete, strict, both training runs: clean-break 0/400 at ≥7, rough 13/400, worn 15/400.
+  26 of those 28 are on presentations 1 and 4 (14 + 12; 2 on presentation 3).
+- The counts move with the ruler (9/9 · ≥8 · ≥7, per 400; released per 200):
+
+  | gate | released | clean-break | rough | worn |
+  |---|---|---|---|---|
+  | points < 4.6 mm (used above) | 0·0·0 | 0·0·0 | 1·3·13 | 1·4·15 |
+  | points < 6.9 mm | 0·0·0 | 0·0·3 | 1·8·26 | 4·12·23 |
+  | turn < 30° | 0·0·0 | 0·0·2 | 1·9·27 | 3·11·28 |
+  | turn < 45° | 0·0·0 | 0·0·4 | 2·12·36 | 5·13·36 |
+
+  Robust under every gate: clean-break never seats 8 of 9 the right way round; rough and worn
+  reach ≥7 many times more often. The full count (1-7 of 1,400) is not robust.
 - Render: `artifacts/rwlora/sherd7_flip.png` (face-on, home vs placed, coloured by home height).
 - Literature part accuracy (chamfer <0.01) has the same blind spot; no reassembly paper found
   that reports an all-sherds-correct rate (paper-reader, 2026-10-02).

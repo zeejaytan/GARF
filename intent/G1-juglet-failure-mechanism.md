@@ -1,6 +1,6 @@
 # G1 — Why does GARF fail on the Juglet?
 
-**Status:** open — three mechanisms ruled out; rough break-face training a small gain, presentation dominates; none found · **Blocked by:** none
+**Status:** open — three mechanisms ruled out; rough/worn break-face training a small gain, presentation dominates; full right-way-round reassembly rare (1-7 of 1,400), never from clean-break; no mechanism found · **Blocked by:** none
 **Effort:** the investigation is largely done; what remains is a decision about how much
 more to spend
 
@@ -55,7 +55,8 @@ presentations, every model's mean ranges over 4-6 sherds.
 |---|---|---|---|---|
 | sherds per attempt, mean of 10 presentations (incl. pinned) | 2.04 | 2.46 | 3.87 | 3.54 |
 | above clean-break | 4/10 (not paired: different point sample) | — | 9/10, smallest win +0.5 | 9/10, two wins of +0.15 / +0.20 |
-| best attempt | 6/9 | 8/9 | 9/9 (5 of 200, presentations 1 and 4) | 9/9 (5 of 200, presentations 1 and 4) |
+| best attempt, own place (blind to turned sherds) | 6/9 | 8/9 | 9/9 (5 of 200) | 9/9 (5 of 200) |
+| best attempt, right way round | 3/9 | 6/9 (1 of 200) | 9/9 (1 of 200) | 8/9 (2 of 200) |
 
 - **Rough 1× beats clean-break on the Juglet** — about 1.4 more sherds per attempt, of 8
   that can move; it still wins 7 of 8 with the two 9/9 presentations removed. This is a
@@ -64,9 +65,10 @@ presentations, every model's mean ranges over 4-6 sherds.
   between GPU nodes, and the clean-break and worn jobs ran on different nodes (gpgpu111,
   gpgpu122). Counting only clear wins it is 8/10, which the rule calls inconclusive.
 - **Clean-break fine-tuning alone does nothing** (above released GARF on 4/10).
-- **The conservator's worn 4× 9/9** needed both a favourable presentation (42) and those
-  particular starting positions: three new sets of starts on the same presentation gave a
-  best of 7, 8 and 7.
+- **The conservator's worn 4× "9/9" (presentation 42) is not a full reassembly.** Sherds 3, 5
+  and 7 sit on their own home surfaces but are turned 143°, 169° and 179° on their own faces;
+  only 2 of 9 are within 4.6 mm point for point (others are turned 17-60°). It also needed those particular starting
+  positions: three new sets of starts on the same presentation gave a best of 7, 8 and 7.
 - **Fractura gains sit on two pots.** Five of the eight pots are fully reassembled by every
   model. The gain is narrow_bottle1 (known to swing by up to 5 sherds with the presentation
   alone) and narrow_bottle3; narrow_bottle3 on its own is above clean-break on 8/10 (rough)
@@ -92,10 +94,31 @@ training runs rough is ahead on 17 of 20 presentations, worn on 19 of 20. The no
 retired for these runs: the seed-42 scores came back identical on a third node.
 The typical (not best) attempt has been looked at (`jug_t05.png`, coloured by mm from home) and
 agrees with the counts. **Not yet looked at:** the presentation-42 vs presentation-7 comparison
-(ticket 03). **Open caveat on the ruler:** own_place counts a sherd that is in place but turned
-as home; this flatters clean-break most (19 of its 43 home sherds on two presentations).
+(ticket 03).
 
-Tickets: `.scratch/rough-worn-dose/issues/01`-`05`. Renders: `artifacts/rwlora/jug_t02.png`
+**Full reassembly, scored the right way round (2026-10-02, ticket 06).** The own-place count was
+**broken for turned sherds** (measurement broken, not method): a sherd spun half a turn on its own
+face still lies on its home surface and counted as placed. The literature's part accuracy has the
+same blind spot. A sherd now also has to sit the right way round: its points a median under
+4.6 mm from their own home points. Re-scoring all 1,400 saved attempts:
+- Of 21 attempts that scored 9 of 9 the old way, **2 are full reassemblies** (rough seed 42,
+  presentation 1; worn seed 7, presentation 4 — the latter by 0.15 mm on one sherd). 14 had a
+  sherd turned 95-179°, 5 a sherd tilted 28-44° and 6-10 mm off.
+- **Full reassembly is rare and its count depends on the ruler:** 2 of 1,400 at 4.6 mm, up to 7
+  with a looser gate (turn under 45°). Not robust enough to compare arms on.
+- **Near-complete is robust:** clean-break never seats 8 of 9 the right way round under any gate
+  tried (≥7: 0-4 of 400); rough and worn reach ≥7 in 13-36 of 400 each. Released GARF's best is 3.
+- **Where the gain sits:** 26 of the 28 ≥7 attempts are on presentations 1 and 4. The gain is
+  what break-face training adds when the presentation is favourable, not a general lift.
+- **Weight:** one pot. The seed-7 and seed-42 worn adapters place sherds almost identically
+  from the same start (0.2-2.1 mm apart), so the second training run is a weak repeat, not an
+  independent one. Five-skeptic refute (wf_21ba12d0-63c): 0 refuted, 4 narrowed, 1 stands; the
+  wording here carries the narrowing.
+- **Eye pending:** a spun "9 of 9" beside a genuine one is staged in visual-qa
+  (`garf_juglet_spun_t06`, `garf_juglet_genuine_t06`); the conservator's note decides whether
+  this ruler matches what a conservator calls reassembled.
+
+Tickets: `.scratch/rough-worn-dose/issues/01`-`06`. Renders: `artifacts/rwlora/jug_t02.png`
 (best attempts only), `jug_t05.png` (typical attempts, mm from home), `jug_arms_redraw.png`.
 
 ## Done when
