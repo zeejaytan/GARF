@@ -39,6 +39,18 @@ The rule, fixed before re-scoring:
       presentation 1 attempt 19, sherd 7 turned 174°; `garf_juglet_genuine_t06` = "B", rough
       s42 presentation 1 attempt 19, every sherd ≤13°; surface coincidence 0.22 / 0.19 mm).
       Titles are the same question on purpose, so the eye is not told which is which.
-      Conservator note read back and replied to: pending
+      Conservator note (2026-10-02, verbatim): "i have seen both pair, i would say both are a
+      perfect reassembly, where previously is good (i can see the shape of vessel, and the
+      sherd's logic is there, just need manual adjustment). so the strict rule is good in
+      principle. but don't completely throw out the previous number, it's a good indication on
+      how well the model is doing"
+      Reply (same round): the eye and the ruler disagree on A. A's sherd 7 is turned 174° on its
+      own face (its points a median 15.7 mm from home), yet the turned sherd covers its home
+      surface to within 1.2 mm, so in an untextured view its outline fills the hole either way;
+      B has every sherd within 13°. Asked the conservator to look again at A's sherd 7, now
+      unblinded, at its break edges against sherds 6 and 8 and any surface marks: is it the
+      right way round? Agreed to keep own place as the second headline number ("vessel shape
+      reads, sherds need manual adjustment") beside right way round ("full reassembly").
+      Box stays open until the A sherd-7 question is answered.
 - [x] Glossary entry and lesson written (umbrella `docs/glossary.md` "own place / right way round", "full reassembly"; `docs/lessons.md` "9 of 9 with three sherds facing the wrong way")
 - [x] G1 updated after refute-finding wf_21ba12d0-63c (0 refuted, 4 narrowed, 1 stands), 2026-10-02
