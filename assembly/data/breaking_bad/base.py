@@ -1,4 +1,4 @@
-from typing import Literal, List
+from typing import Literal, List, Optional
 
 import random
 
@@ -50,6 +50,7 @@ class BreakingBadBase(Dataset):
         frac_erode_prob: float = 0.0,
         frac_erode_min: float = 0.3,
         frac_erode_max: float = 1.0,
+        rot_seed: Optional[int] = None,
     ):
         super().__init__()
         self.split = split
@@ -89,6 +90,10 @@ class BreakingBadBase(Dataset):
         self.frac_erode_prob = frac_erode_prob
         self.frac_erode_min = frac_erode_min
         self.frac_erode_max = frac_erode_max
+        # Turn-only reseed (Juglet ticket 07): when set, each sherd's random input
+        # rotation is re-drawn from (rot_seed, index) while the sampled points stay
+        # as the eval seed drew them. None = original behaviour.
+        self.rot_seed = rot_seed
         self.data_list = self.get_data_list()
 
         print("Using mesh sample strategy:", self.mesh_sample_strategy)

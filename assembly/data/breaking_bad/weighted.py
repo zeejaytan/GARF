@@ -117,14 +117,25 @@ class BreakingBadWeighted(BreakingBadBase):
 
         pointclouds, pointclouds_normals, quaternions, translations = [], [], [], []
         scale = []
+        rot_rng = (
+            np.random.RandomState([self.rot_seed, data["index"]])
+            if self.rot_seed is not None
+            else None
+        )
         for part_idx in range(num_parts):
             start = offset[part_idx]
             end = offset[part_idx + 1]
 
-            pointcloud, translation = recenter_pc(pointclouds_gt[start:end])
+            centred, translation = recenter_pc(pointclouds_gt[start:end])
             pointcloud, pointcloud_normals, quaternion = rotate_pc(
-                pointcloud, pointclouds_normals_gt[start:end]
+                centred, pointclouds_normals_gt[start:end]
             )
+            if rot_rng is not None:
+                # The default turn above is drawn and discarded so the global RNG
+                # stream (shuffle, later objects) is untouched; only turns change.
+                pointcloud, pointcloud_normals, quaternion = rotate_pc(
+                    centred, pointclouds_normals_gt[start:end], numpy_rng=rot_rng
+                )
             pointcloud, pointcloud_normals, order = shuffle_pc(
                 pointcloud, pointcloud_normals
             )

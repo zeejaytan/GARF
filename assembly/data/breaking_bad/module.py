@@ -30,6 +30,7 @@ class BreakingBadDataModule(L.LightningDataModule):
         frac_erode_min: float = 0.3,
         frac_erode_max: float = 1.0,
         additional_data_root: Optional[Dict[str, str]] = None,
+        rot_seed: Optional[int] = None,
     ):
         super().__init__()
         self.data_root = data_root
@@ -70,6 +71,9 @@ class BreakingBadDataModule(L.LightningDataModule):
                 f"Fracture-rim oversampling ON: frac={self.rim_oversample_frac}, "
                 f"band_frac={self.rim_band_frac}, relief_pct={self.rim_relief_pct}"
             )
+
+        # Turn-only reseed, test split only (see BreakingBadBase.rot_seed).
+        self.rot_seed = rot_seed
 
         # If breaking_bad_other_data_root is provided
         self.additional_data_root = additional_data_root
@@ -164,6 +168,7 @@ class BreakingBadDataModule(L.LightningDataModule):
                         rim_oversample_frac=self.rim_oversample_frac,
                         rim_band_frac=self.rim_band_frac,
                         rim_relief_pct=self.rim_relief_pct,
+                        rot_seed=self.rot_seed,
                     )
                     for category in self.categories
                 ]
