@@ -41,3 +41,25 @@ within ≤0.15 sherd per attempt on another.
 - [ ] Table of best and mean per turn set; render of one high and one low turn set before
       reporting
 - [ ] G1 updated with the result and the date
+
+## Runs (2026-10-03)
+
+- 32101397 clean-break: COMPLETED 0:0, gpgpu104, 6 min 43 s; reconcile 0 mismatches in all 11.
+- 32101396 worn 4×: FAILED 1:0 after 5 s, `ARM: set ARM`. The settings never reached the
+  job: `pull_and_sbatch.sh` re-quotes its arguments with `printf %q`, which broke the
+  `--export=` value that holds spaces. Submit error, not a code or method fault. Resubmitted
+  directly over ssh as **32143607** (pending).
+
+Clean-break, interim (the reading rests on worn 4×). Sherds in own place per attempt, best of
+20 (attempts reaching it) and mean:
+
+| turns | none (control) | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| own place | 7 (1) 2.90 | 5 (3) 2.90 | 6 (4) 4.00 | 8 (1) 3.75 | 4 (2) 1.80 | 7 (1) 3.45 | 5 (1) 2.50 | 4 (6) 2.80 | 5 (2) 2.85 | 5 (2) 2.60 | 6 (1) 2.85 |
+
+- Control: ticket 03 gave 7 (1) 2.85 for these settings; 2.90 here, on another node, inside the
+  ≤0.15 node tolerance.
+- Spread of the 10 turn-set means: **0.64 sherd** (range 1.80-4.00). For comparison, the same
+  model across 10 presentations: 1.18. New starts on one presentation: ~0.2.
+- So for clean-break the turn carries roughly half the presentation effect: "in between".
+Scores: `artifacts/rwlora/t07/jug_t07_scores.json`, script scratchpad `t07_score.py`.
