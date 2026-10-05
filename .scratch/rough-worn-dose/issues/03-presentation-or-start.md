@@ -16,7 +16,7 @@ fine-tune on the Juglet in two arms:
 **Answers:** G1 (if the Juglet result depends mainly on how the sherds are sampled and
 presented, that sensitivity is itself a candidate mechanism, measurable on a second object)
 **Blocked by:** None (can start immediately; independent of 02)
-**Status:** done
+**Status:** resolved
 
 Readings, fixed before results:
 - Presentation 42 fixed and new starts keep worn 4× near its old mean (≥ 4 sherds per
