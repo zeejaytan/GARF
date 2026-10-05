@@ -12,7 +12,7 @@ Prefix **`G`**, permanent. Numbers are never reused. **G5 is next.**
 
 | # | Question | Status | Blocked by |
 |---|---|---|---|
-| [G1](G1-juglet-failure-mechanism.md) | Why does GARF fail on the Juglet? | open — three mechanisms ruled out; rough/worn break-face training a small gain, presentation dominates; full right-way-round reassembly rare (1-7 of 1,400), never from clean-break | none |
+| [G1](G1-juglet-failure-mechanism.md) | Why does GARF fail on the Juglet? | open — three mechanisms ruled out; rough/worn break-face training a small gain, presentation dominates (input turn about 15% of it); **full reassembly achieved** with rough- and worn-trained adapters (2 genuine, witnessed), rare (1-7 of 1,400), never from clean-break | none |
 | [G2](G2-does-piece-count-break-it.md) | Does piece count break it, or is that a coincidence? | open | none |
 | [G3](G3-second-architecture-for-u2.md) | Can GARF be the second architecture that tests U2? | open | [G1](G1-juglet-failure-mechanism.md) |
 | [G4](G4-deploy-without-ground-truth.md) | What can a conservator do with a GARF proposal that has no answer key? | open | `../../intent/U1` |

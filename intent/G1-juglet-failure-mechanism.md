@@ -1,6 +1,6 @@
 # G1 — Why does GARF fail on the Juglet?
 
-**Status:** open — three mechanisms ruled out; rough/worn break-face training a small gain, presentation dominates; full right-way-round reassembly rare (1-7 of 1,400), never from clean-break; no mechanism found · **Blocked by:** none
+**Status:** open — three mechanisms ruled out; rough/worn break-face training a small gain, presentation dominates (the sherds' input turn is about 15% of it, the sampled points most of the rest); **full reassembly achieved** with rough- and worn-trained adapters (2 genuine, witnessed), rare (1-7 of 1,400), never from clean-break; no mechanism found · **Blocked by:** none
 **Effort:** the investigation is largely done; what remains is a decision about how much
 more to spend
 
@@ -96,8 +96,18 @@ The typical (not best) attempt has been looked at (`jug_t05.png`, coloured by mm
 agrees with the counts. **Presentation 42 vs 7 (2026-10-02, ticket 03):** how the surface points are sampled does
 not explain it: every presentation puts nearly the same share of points on the join edges
 (rank correlation with score +0.25, p 0.44, 12 presentations), and the face-on render shows
-no bare edge on presentation 7. The untested half of a presentation is the random turn each
-sherd is handed in; separating it needs a run with points fixed and turns re-drawn.
+no bare edge on presentation 7. **The random input turn (2026-10-05, ticket 07):** re-drawing
+only the turn each sherd is handed in (points of presentation 42 and the starts held fixed,
+10 turn sets × 20 attempts) moves worn 4×'s mean over 2.90-5.45 own place per attempt, against
+1.30-7.00 across presentations. Net of the luck of 20 attempts, the turn carries about **15% of
+the presentation effect** for worn 4× and 25% for clean-break: real (p 2e-6), but the smaller
+part. Most of it sits in the sampled points, or in points and turns together, in a way
+join-edge coverage does not capture. Paired on the same turn sets, worn 4× stays ahead of
+clean-break on 10 of 11 the right way round, by 0.46 sherd per attempt (11 of 11, 1.2, on own
+place), but all on presentation 42's points, the presentation worn 4× was chosen on. Render
+`jug_t07_turns_high_low.png` agrees: the low sets lose the lower-body sherds. Weight: one pot,
+one training per model, one set of sampled points. Five-skeptic refute (wf_2ae0daa1-d9b): 0
+refuted, 3 narrowed, 2 stand; the wording here carries the narrowing.
 **Sherds 1 and 2 (ticket 04):** not a look-alike pair. Their exchange is the most frequent of
 any pair but not clearly (29 vs 22 and 20 in 1,400 attempts); sherd 2 is simply the sherd
 that most often lands in another's home.
@@ -126,7 +136,7 @@ same blind spot. A sherd now also has to sit the right way round: its points a m
   matches what a conservator calls reassembled. Own place stays reported beside it as "the
   vessel's shape reads, sherds need manual adjustment".
 
-Tickets: `.scratch/rough-worn-dose/issues/01`-`06`. Renders: `artifacts/rwlora/jug_t02.png`
+Tickets: `.scratch/rough-worn-dose/issues/01`-`07`. Renders: `artifacts/rwlora/jug_t02.png`
 (best attempts only), `jug_t05.png` (typical attempts, mm from home), `jug_arms_redraw.png`.
 
 ## Done when

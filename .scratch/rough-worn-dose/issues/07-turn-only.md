@@ -12,7 +12,7 @@ laptop and do not follow the score. The turns are not saved, so they need this r
 **Answers:** G1 (if the turn decides it, the Juglet result is mostly luck of orientation, not
 something about worn breaks, and every arm comparison so far needs reading through that)
 **Blocked by:** 03
-**Status:** in progress
+**Status:** done (2026-10-05)
 
 Knob: `++data.rot_seed=<n>` (test split only). Each sherd's turn comes from its own generator
 seeded by (rot_seed, object index); the default turn is still drawn and discarded so the
@@ -40,7 +40,7 @@ within ≤0.15 sherd per attempt on another.
 - [x] Control reproduces ticket 03 (worn 7 (2) 4.65 exactly; clean-break 2.90 vs 2.85, other node)
 - [x] Table of best and mean per turn set; render of one high and one low turn set before
       reporting (`artifacts/rwlora/jug_t07_turns_high_low.png`)
-- [ ] G1 updated with the result and the date
+- [x] G1 updated with the result and the date (2026-10-05, after refute wf_2ae0daa1-d9b)
 
 ## Runs (2026-10-03)
 
@@ -76,7 +76,7 @@ Scores: `artifacts/rwlora/t07/jug_t07_scores.json`, script scratchpad `t07_score
   the same model spread 1.90; new starts on one presentation ~0.1. Part of the 0.81 is just
   20 attempts being a small sample (~0.35 per set mean), which the presentation figure carries too.
 - **Pre-registered reading: in between.** 0.81 is above the 0.4 "turn does not decide it" line
-  and below the 1.2 "turn decides it" line; three sets fall outside 3.5-5.8. Clean-break reads
+  and below the 1.2 "turn decides it" line; four sets fall outside 3.5-5.8. Clean-break reads
   the same (0.64 against 1.18).
 - The turn alone never pulled worn 4× below 2.9 per attempt; whole presentations reached 1.3.
   So the worst presentations need the sampled points, or the points and turns together, as
@@ -87,9 +87,35 @@ Scores: `artifacts/rwlora/t07/jug_t07_scores.json`, script scratchpad `t07_score
 
 Worn 4× against clean-break, paired on the same turn set: worn higher on **11 of 11** (gap
 0.45-2.10, mean 1.2 sherds per attempt; Wilcoxon p 0.001). Whether a turn set is good for one
-model barely predicts whether it is good for the other (rank correlation +0.46, p 0.19). One
-pot, one training per model, one set of sampled points.
+model only loosely predicts whether it is good for the other (rank correlation +0.46, p 0.16
+over the 11 sets). One pot, one training per model, one set of sampled points.
 
-Meaning for G1: the random input turn is a real part of the presentation effect (about half its
-size), not all of it. Comparing training arms on one presentation stays risky, but a paired
-comparison over many turns is now available, and on it worn 4× beats clean-break every time.
+## Refute-finding (2026-10-05, wf_2ae0daa1-d9b): 0 refuted, 3 weakened, 2 stand
+
+The numbers reproduce, the knob holds on the real data (true-pot points identical across all
+22 runs to about 0.01 mm), and every run was scored against the same reassembly. Corrections,
+each re-computed by the lead from `jug_t07_scores.json` and `jug_t06_rescore.json`:
+- **"About half" overstated it.** 0.81 / 1.90 is a ratio of spreads. Removing the luck of 20
+  attempts (about 0.35 sherd on a set mean) and comparing shares of the variation, the turn
+  carries about **15%** of the presentation effect for worn 4× (0.53 of 3.55) and 25% for
+  clean-break (0.33 of 1.33); on the right-way-round count 7% and 26%. The turn is a real but
+  **minority** part; the sampled points, or points and turns together, carry most of it. With
+  10 sets the spread's 95% range is about 0.56-1.47, so "in between" is not cleanly separated
+  from "turn decides it" on the pre-registered line; the share-of-variation reading is firmer.
+- **Paired, right way round:** worn 4× ahead on **10 of 11** (loses set 10 by 0.20), mean gap
+  **0.46** sherd (p 0.006), against 11 of 11 and 1.2 on own place. Most of the own-place margin
+  is sherds in place but turned. Five right-way-round gaps are ≤ 0.30, near the ≤ 0.15 node
+  difference.
+- **All 11 pairs share presentation 42's points**, the presentation worn 4× was chosen on (best
+  of six strengths). On ticket 02's presentations the gap was small or reversed on three. So
+  "ahead on every turn" holds on a favourable point set only.
+- **The neck/handle block is the pinned anchor** (sherd 0, top 69% of the height, placed by
+  construction). It seats every time because it is not tested; every figure counts it. Of the
+  8 sherds in play, worn 4× places 1.9-4.45 per attempt across turn sets.
+- The "~0.1 across new starts" yardstick is below the 0.35 that 20-attempt luck alone gives;
+  the honest floor is ~0.35. The turn is still clearly real (one-way ANOVA p 2e-6).
+
+Meaning for G1: the random input turn is a real but minority part of the presentation effect
+(about 15% of it for worn 4×). Most of what a presentation does sits in the sampled points or
+in points and turns together. On presentation 42's points, worn 4× stays ahead of clean-break
+across turns, by about half a sherd per attempt the right way round.
