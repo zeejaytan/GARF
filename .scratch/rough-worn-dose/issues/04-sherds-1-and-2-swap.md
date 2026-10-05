@@ -11,7 +11,7 @@ a person might also face.
 **Answers:** G1 (a named, measurable candidate: look-alike sherds whose break edges do not
 tell them apart. It is testable on a second object by finding a look-alike pair there)
 **Blocked by:** None (can start immediately)
-**Status:** done
+**Status:** resolved
 Eye (not reached): the staging step was conditional on step 1, which stopped the ticket.
 
 - [x] Count every swapped pair across all saved Juglet attempts. **Stopped here** (2026-10-02):

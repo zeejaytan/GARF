@@ -11,7 +11,7 @@ beside it, reported as the best of N with how many attempts reached it.
 
 **Blocked by:** 05 (done)
 
-**Status:** done
+**Status:** resolved
 
 **Needs-eye:** a spun-sherd "9/9" beside a genuine 9/9, staged in visual-qa; the conservator's
 note decides whether the new count matches what a conservator calls reassembled.

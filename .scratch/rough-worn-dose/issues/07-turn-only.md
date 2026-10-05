@@ -12,7 +12,7 @@ laptop and do not follow the score. The turns are not saved, so they need this r
 **Answers:** G1 (if the turn decides it, the Juglet result is mostly luck of orientation, not
 something about worn breaks, and every arm comparison so far needs reading through that)
 **Blocked by:** 03
-**Status:** done (2026-10-05)
+**Status:** resolved (2026-10-05)
 
 Knob: `++data.rot_seed=<n>` (test split only). Each sherd's turn comes from its own generator
 seeded by (rot_seed, object index); the default turn is still drawn and discarded so the
