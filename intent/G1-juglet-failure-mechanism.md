@@ -4,6 +4,17 @@
 **Effort:** the investigation is largely done; what remains is a decision about how much
 more to spend
 
+## Where it stands
+
+Of about 1,400 GARF attempts, 2 are full reassemblies, and both came from training on
+rough or worn breaks; none from clean breaks. How the sherds are presented to GARF
+matters most. The starting turn of each sherd explains about 15% of that; the sampled
+points most of the rest. Three suspected mechanisms are ruled out; none is found.
+
+Weight: one pot; two successes are too few to say what makes them succeed.
+Next: the three queued tickets: stronger rough/worn training, and ten presentations across four trained models.
+Viewer: `garf_juglet_genuine_t06` (a full reassembly) beside `garf_juglet_spun_t06` (one sherd spun in place)
+
 ## Why it matters
 
 GARF assembles broken objects of six pieces or fewer, synthetic and real, well. It fails
