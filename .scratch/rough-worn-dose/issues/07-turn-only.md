@@ -36,10 +36,10 @@ within ≤0.15 sherd per attempt on another.
 
 - [x] Knob added, default unchanged (synthetic check: default turns repeat, gt points and the
       numpy/python random streams untouched with rot_seed set; turns differ by seed and repeat)
-- [ ] Jobs run, sacct State/ExitCode recorded, reconcile 0 mismatches
-- [ ] Control reproduces ticket 03
-- [ ] Table of best and mean per turn set; render of one high and one low turn set before
-      reporting
+- [x] Jobs run, sacct State/ExitCode recorded, reconcile 0 mismatches
+- [x] Control reproduces ticket 03 (worn 7 (2) 4.65 exactly; clean-break 2.90 vs 2.85, other node)
+- [x] Table of best and mean per turn set; render of one high and one low turn set before
+      reporting (`artifacts/rwlora/jug_t07_turns_high_low.png`)
 - [ ] G1 updated with the result and the date
 
 ## Runs (2026-10-03)
@@ -48,7 +48,8 @@ within ≤0.15 sherd per attempt on another.
 - 32101396 worn 4×: FAILED 1:0 after 5 s, `ARM: set ARM`. The settings never reached the
   job: `pull_and_sbatch.sh` re-quotes its arguments with `printf %q`, which broke the
   `--export=` value that holds spaces. Submit error, not a code or method fault. Resubmitted
-  directly over ssh as **32143607** (pending).
+  directly over ssh as **32143607**: COMPLETED 0:0, gpgpu107, 6 min 51 s, 2026-10-03;
+  reconcile 0 mismatches in all 11.
 
 Clean-break, interim (the reading rests on worn 4×). Sherds in own place per attempt, best of
 20 (attempts reaching it) and mean:
@@ -63,3 +64,32 @@ Clean-break, interim (the reading rests on worn 4×). Sherds in own place per at
   model across 10 presentations: 1.18. New starts on one presentation: ~0.2.
 - So for clean-break the turn carries roughly half the presentation effect: "in between".
 Scores: `artifacts/rwlora/t07/jug_t07_scores.json`, script scratchpad `t07_score.py`.
+
+## Worn 4× and reading (2026-10-05)
+
+| turns | none (control) | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| worn 4×, own place | 7 (2) 4.65 | 6 (1) 3.35 | 7 (6) 5.45 | 8 (1) 4.40 | 5 (2) 2.90 | 8 (2) 4.35 | 8 (1) 3.45 | 8 (2) 4.90 | 8 (3) 4.40 | **9 (1)** 4.40 | 7 (1) 3.30 |
+| worn 4×, right way round | 5 (1) 2.35 | 3 (2) 1.55 | 5 (1) 2.55 | 6 (1) 2.50 | 2 (10) 1.50 | 3 (2) 1.60 | 4 (1) 1.60 | 4 (2) 2.15 | 5 (1) 2.25 | 5 (1) 2.50 | 3 (2) 1.60 |
+
+- Spread of the 10 turn-set means: **0.81 sherd** (range 2.90-5.45). Across 10 presentations
+  the same model spread 1.90; new starts on one presentation ~0.1. Part of the 0.81 is just
+  20 attempts being a small sample (~0.35 per set mean), which the presentation figure carries too.
+- **Pre-registered reading: in between.** 0.81 is above the 0.4 "turn does not decide it" line
+  and below the 1.2 "turn decides it" line; three sets fall outside 3.5-5.8. Clean-break reads
+  the same (0.64 against 1.18).
+- The turn alone never pulled worn 4× below 2.9 per attempt; whole presentations reached 1.3.
+  So the worst presentations need the sampled points, or the points and turns together, as
+  well as the turn.
+- Render (typical attempt of turn sets 2 and 4, both models): the neck/handle block seats on
+  every one; what differs is the lower-body sherds, red on the low sets. Same place the
+  presentation effect showed in ticket 03.
+
+Worn 4× against clean-break, paired on the same turn set: worn higher on **11 of 11** (gap
+0.45-2.10, mean 1.2 sherds per attempt; Wilcoxon p 0.001). Whether a turn set is good for one
+model barely predicts whether it is good for the other (rank correlation +0.46, p 0.19). One
+pot, one training per model, one set of sampled points.
+
+Meaning for G1: the random input turn is a real part of the presentation effect (about half its
+size), not all of it. Comparing training arms on one presentation stays risky, but a paired
+comparison over many turns is now available, and on it worn 4× beats clean-break every time.
