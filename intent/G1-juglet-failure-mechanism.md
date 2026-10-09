@@ -10,6 +10,8 @@ Of about 1,400 GARF attempts, 2 are full reassemblies, and both came from traini
 rough or worn breaks; none from clean breaks. How the sherds are presented to GARF
 matters most. The starting turn of each sherd explains about 15% of that; the sampled
 points most of the rest. Three suspected mechanisms are ruled out; none is found.
+A candidate, not yet a mechanism: GARF often fits the body sherds (4, 5, 6) to each other
+and then puts the block in the wrong place against the anchor sherd (tora juglet-cause 16).
 
 Weight: one pot; two successes are too few to say what makes them succeed.
 Next: the three queued tickets: stronger rough/worn training, and ten presentations across four trained models.
@@ -149,6 +151,27 @@ same blind spot. A sherd now also has to sit the right way round: its points a m
 
 Tickets: `.scratch/rough-worn-dose/issues/01`-`07`. Renders: `artifacts/rwlora/jug_t02.png`
 (best attempts only), `jug_t05.png` (typical attempts, mm from home), `jug_arms_redraw.png`.
+
+## The body is built right and put in the wrong place (2026-10-05, tora `juglet-cause/16`)
+
+Measured read-only on GARF's 2,140 saved Juglet attempts, beside TORA's 3,120. Sherds 2, 4,
+5, 6 and 8 almost never go home the right way round on either method; 1, 3 and 7 sometimes
+do, so sherd 2 is not singled out. The conservator confirms sherd 2's place in `juglet_gt`,
+and every real join there closes to 0.04-0.5 mm, so the reference is not the cause.
+GARF joins body sherds 4 and 6 correctly to each other in 54% of attempts (TORA 18%) but
+puts them at home under 4% of the time; all three body sherds fit together in 17% and sit
+home together in 1.3%. GARF finds the body's joins and then misplaces the block. None of 4,
+5, 6 touches the anchor sherd 0, which fits that reading. Sherds 2 and 8 are wrong even
+against their own neighbours, a separate and unexplained problem (their join with the
+anchor is shorter, 16 mm against 19-29 mm for sherds that seat; untested, could be chance).
+
+- **Which of the three:** the method failed (placement across the pot), not the break-face
+  matching and not the reference.
+- **Weight:** one pot, two methods; the attempts come from a few dozen presentations, so
+  they are not independent trials. This is a candidate mechanism on one object, not the
+  "measurable on a second object" the first box below asks for, so no box is ticked.
+
+Outputs: `/mnt/project-files/t16_rel_garf_output.txt`, `t16_break_output.txt`.
 
 ## Done when
 
