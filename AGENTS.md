@@ -9,7 +9,7 @@ Follow the workspace root **`../AGENTS.md`** (laptop ↔ GitHub ↔ Spartan) for
 | GitHub fork (`origin`) | `zeejaytan/GARF` |
 | Upstream | `ai4ce/GARF` |
 | Spartan checkout (`REMOTE_ROOT`) | `/data/gpfs/projects/punim2657/GARF/repo` — code only; takes commits from GitHub, never edited |
-| Spartan working area (untracked) | `/data/gpfs/projects/punim2657/GARF/` — `input/`, `output/`, `logs/` (Slurm output in `logs/slurm/`), `runs/`, `attic/`, the `.venv` |
+| Spartan working area (untracked) | `/data/gpfs/projects/punim2657/GARF/` — `input/`, `output/`, `logs/` (Slurm output in `logs/slurm/`), `runs/`, `attic/`. The Python env is `CRAG/.venv`, shared |
 | SSH | `Host spartan`, user `zhuojiat` |
 | Remote helpers | `scripts/remote/pull_and_sbatch.sh`, `job_status.sh`, `fetch_artifacts.sh` |
 | Setup docs | `docs/local-claude-hpc.md`, `docs/laptop-agent-setup.md` |
