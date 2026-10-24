@@ -26,6 +26,8 @@ git push origin HEAD
 ./scripts/remote/fetch_artifacts.sh logs/some_run ./artifacts/
 ```
 
+Workbench layout, and the harvest-then-delete procedure that goes with it: `C:\PR\docs\agents\workspace-hygiene.md`. Deletion follows `C:\PR\AGENTS.md` rule 13. Canonical checkout `/data/gpfs/projects/punim2657/GARF`; its `runs/` + `attic/` are not yet set up.
+
 ## Domain / debugging
 
 Prefer probes over guesses (Hydra/OmegaConf, dataloader length, HDF5 splits). Do not invent config keys. Inspect Spartan inputs/logs over SSH; keep diffs minimal. Session notes may live under `docs/notes/`. If `graphify-out/GRAPH_REPORT.md` exists, use it for architecture questions.
