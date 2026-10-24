@@ -4,7 +4,7 @@
 #SBATCH --time=12:00:00
 #SBATCH --mem=32G
 #SBATCH --cpus-per-task=8
-#SBATCH --output=exp9_pseudo_gt_bound_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/slurm/exp9_pseudo_gt_bound_%j.out
 
 # Exp 9 — PF++ PSEUDO-GT LABEL-ERROR BOUND (Juglet pairwise oracle).
 #
@@ -24,7 +24,9 @@
 
 set -euo pipefail
 
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 
 STAMP=$(date +%Y%m%d_%H%M%S)
@@ -37,7 +39,7 @@ echo "=== Exp 9: PF++ pseudo-GT label-error bound ==="
 echo "Date: $(date)"
 echo "Node: $(hostname)"
 
-python scripts/juglet_pseudo_gt_bound.py \
+python $GARF_REPO/scripts/juglet_pseudo_gt_bound.py \
     --control-hdf5 input/control_ceramics_pairs.hdf5 \
     --control-adjacency logs/diagnostics/control_ceramics_adjacency.json \
     --control-run-dirs \

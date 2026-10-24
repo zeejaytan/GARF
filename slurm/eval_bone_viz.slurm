@@ -5,9 +5,11 @@
 #SBATCH --time=00:30:00
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=8
-#SBATCH --output=eval_bone_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/slurm/eval_bone_%j.out
 
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
@@ -27,7 +29,7 @@ echo ""
 
 # Step 1: Run evaluation
 echo "── Step 1: Running GARF evaluation ──"
-HYDRA_FULL_ERROR=1 python eval.py \
+HYDRA_FULL_ERROR=1 python $GARF_REPO/eval.py \
     seed=42 \
     experiment=denoiser_flow_matching \
     experiment_name=$EXPERIMENT_NAME \
@@ -53,7 +55,7 @@ echo "── Step 2: Generating visualizations ──"
 
 if [ -d "$RESULTS_DIR" ]; then
     # Generate all sample pages + index
-    python generate_viz.py \
+    python $GARF_REPO/generate_viz.py \
         --results_dir "$RESULTS_DIR" \
         --hdf5 "$HDF5_PATH" \
         --all \

@@ -48,7 +48,7 @@ The HPC clone historically tracked `ai4ce/GARF`. For this workflow:
 3. On Spartan:
 
 ```bash
-cd /data/gpfs/projects/punim2657/GARF
+cd /data/gpfs/projects/punim2657/GARF/repo
 git remote rename origin upstream   # if origin was ai4ce
 git remote add origin git@github.com:zeejaytan/GARF.git
 # or: git remote set-url origin <your-fork-url>
@@ -75,7 +75,7 @@ git add … && git commit && git push
 Environment overrides (optional):
 
 - `SPARTAN_HOST` (default `spartan`)
-- `REMOTE_ROOT` (default `/data/gpfs/projects/punim2657/GARF`)
+- `REMOTE_ROOT` (default `/data/gpfs/projects/punim2657/GARF/repo`; data and logs stay in `GARF/`)
 
 ## Trade-offs
 

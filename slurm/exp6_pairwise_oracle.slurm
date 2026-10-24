@@ -5,7 +5,7 @@
 #SBATCH --time=02:00:00
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=8
-#SBATCH --output=exp6_pairwise_oracle_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/slurm/exp6_pairwise_oracle_%j.out
 
 # Exp 6 — pairwise oracle decomposition for "why GARF fails on Juglet".
 # Runs GARF (deploy mode, anchor_free) on every 2-piece Juglet subset
@@ -20,7 +20,9 @@
 
 set -euo pipefail
 
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
@@ -39,7 +41,7 @@ echo "Date: $(date)"
 echo "GPU: $(nvidia-smi --query-gpu=name --format=csv,noheader)"
 
 # Build (or rebuild) the 36-pair HDF5 from the canonical rebuilt geometry.
-python scripts/build_juglet_pairs_hdf5.py \
+python $GARF_REPO/scripts/build_juglet_pairs_hdf5.py \
     --source "$SRC_HDF5" \
     --sample artifact/Juglet-000 \
     --out "$PAIR_HDF5"
@@ -48,7 +50,7 @@ RUN_DIRS=()
 for SEED in 41 42 43; do
     NAME="${TAGROOT}_s${SEED}"
     echo "--- eval all pairs (seed=${SEED}) ---"
-    HYDRA_FULL_ERROR=1 python eval.py \
+    HYDRA_FULL_ERROR=1 python $GARF_REPO/eval.py \
         seed="${SEED}" \
         experiment=denoiser_flow_matching \
         experiment_name="${NAME}" \
@@ -75,12 +77,12 @@ for SEED in 41 42 43; do
 done
 
 echo "=== Pairwise probe summary ==="
-python scripts/summarize_pairwise_oracle.py \
+python $GARF_REPO/scripts/summarize_pairwise_oracle.py \
     --run-dirs "${RUN_DIRS[@]}" \
     --out "$PROBE_OUT"
 
 echo "=== GLB gallery (seed 42) ==="
-python generate_viz.py \
+python $GARF_REPO/generate_viz.py \
     --results_dir "logs/deploy/${TAGROOT}_s42/version_0/json_results" \
     --hdf5 "$PAIR_HDF5" \
     --all --output_dir "viz_output/${TAGROOT}" \

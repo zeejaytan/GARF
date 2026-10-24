@@ -5,9 +5,11 @@
 #SBATCH --time=02:00:00
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=8
-#SBATCH --output=eval_complex_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/slurm/eval_complex_%j.out
 
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
@@ -28,7 +30,7 @@ EXPERIMENT_NAME="bone_syn_pig_${TIMESTAMP}"
 HDF5_PATH="input/Fractura/bone_synthetic.hdf5"
 
 echo "══ Test 1: bone_synthetic / pig (5-20 frags) ══"
-HYDRA_FULL_ERROR=1 python eval.py \
+HYDRA_FULL_ERROR=1 python $GARF_REPO/eval.py \
     seed=42 \
     experiment=denoiser_flow_matching \
     experiment_name=$EXPERIMENT_NAME \
@@ -58,7 +60,7 @@ echo ""
 EXPERIMENT_NAME="bone_syn_rib_${TIMESTAMP}"
 
 echo "══ Test 2: bone_synthetic / rib (5-50 frags) ══"
-HYDRA_FULL_ERROR=1 python eval.py \
+HYDRA_FULL_ERROR=1 python $GARF_REPO/eval.py \
     seed=42 \
     experiment=denoiser_flow_matching \
     experiment_name=$EXPERIMENT_NAME \
@@ -89,7 +91,7 @@ EXPERIMENT_NAME="fractura_real_ceramics_${TIMESTAMP}"
 HDF5_PATH="input/Fractura/fractura_real.hdf5"
 
 echo "══ Test 3: fractura_real / ceramics (3-12 frags) ══"
-HYDRA_FULL_ERROR=1 python eval.py \
+HYDRA_FULL_ERROR=1 python $GARF_REPO/eval.py \
     seed=42 \
     experiment=denoiser_flow_matching \
     experiment_name=$EXPERIMENT_NAME \
@@ -119,7 +121,7 @@ echo ""
 EXPERIMENT_NAME="fractura_real_egg_${TIMESTAMP}"
 
 echo "══ Test 4: fractura_real / egg (3-5 frags) ══"
-HYDRA_FULL_ERROR=1 python eval.py \
+HYDRA_FULL_ERROR=1 python $GARF_REPO/eval.py \
     seed=42 \
     experiment=denoiser_flow_matching \
     experiment_name=$EXPERIMENT_NAME \
@@ -149,7 +151,7 @@ echo ""
 EXPERIMENT_NAME="fractura_real_bones_${TIMESTAMP}"
 
 echo "══ Test 5: fractura_real / bones (2-3 frags) ══"
-HYDRA_FULL_ERROR=1 python eval.py \
+HYDRA_FULL_ERROR=1 python $GARF_REPO/eval.py \
     seed=42 \
     experiment=denoiser_flow_matching \
     experiment_name=$EXPERIMENT_NAME \
@@ -180,7 +182,7 @@ EXPERIMENT_NAME="tray_archaeological_${TIMESTAMP}"
 HDF5_PATH="input/tray_archaeological.hdf5"
 
 echo "══ Test 6: tray_archaeological / artifact (40 frags) ══"
-HYDRA_FULL_ERROR=1 python eval.py \
+HYDRA_FULL_ERROR=1 python $GARF_REPO/eval.py \
     seed=42 \
     experiment=denoiser_flow_matching \
     experiment_name=$EXPERIMENT_NAME \

@@ -5,7 +5,7 @@
 #SBATCH --time=02:00:00
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=8
-#SBATCH --output=exp6b_control_pairs_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/slurm/exp6b_control_pairs_%j.out
 
 # Exp 6b — POSITIVE CONTROL for the Juglet pairwise oracle.
 # Runs GARF (deploy mode, anchor_free — identical config to Exp 6) on every
@@ -17,7 +17,9 @@
 
 set -euo pipefail
 
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
@@ -37,7 +39,7 @@ echo "Date: $(date)"
 echo "GPU: $(nvidia-smi --query-gpu=name --format=csv,noheader)"
 
 # (Re)build the control pairs HDF5 + GT adjacency labels.
-python scripts/build_control_pairs_hdf5.py \
+python $GARF_REPO/scripts/build_control_pairs_hdf5.py \
     --source "$SRC_HDF5" \
     --objects ceramics/pink_bowl ceramics/narrow_bottle2 \
               ceramics/narrow_bottle4 ceramics/blue_pot \
@@ -49,7 +51,7 @@ RUN_DIRS=()
 for SEED in 41 42 43; do
     NAME="${TAGROOT}_s${SEED}"
     echo "--- eval control pairs (seed=${SEED}) ---"
-    HYDRA_FULL_ERROR=1 python eval.py \
+    HYDRA_FULL_ERROR=1 python $GARF_REPO/eval.py \
         seed="${SEED}" \
         experiment=denoiser_flow_matching \
         experiment_name="${NAME}" \
@@ -76,7 +78,7 @@ for SEED in 41 42 43; do
 done
 
 echo "=== control pairwise probe summary ==="
-python scripts/summarize_control_pairs.py \
+python $GARF_REPO/scripts/summarize_control_pairs.py \
     --run-dirs "${RUN_DIRS[@]}" \
     --adjacency "$ADJ" \
     --juglet-adjacency logs/diagnostics/juglet_adjacency/adjacency.json \

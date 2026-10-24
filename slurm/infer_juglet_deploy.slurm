@@ -5,9 +5,11 @@
 #SBATCH --time=00:30:00
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=8
-#SBATCH --output=infer_juglet_deploy_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/slurm/infer_juglet_deploy_%j.out
 
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
@@ -19,7 +21,7 @@ echo "=== GARF Juglet deploy (anchor-free, NO ref-part GT snap) ==="
 echo "Date: $(date)"
 echo "GPU: $(nvidia-smi --query-gpu=name --format=csv,noheader)"
 
-HYDRA_FULL_ERROR=1 python eval.py \
+HYDRA_FULL_ERROR=1 python $GARF_REPO/eval.py \
     seed=42 \
     experiment=denoiser_flow_matching \
     experiment_name=$EXPERIMENT_NAME \
@@ -48,7 +50,7 @@ echo "JSON: $RESULTS_DIR"
 echo "GLB:  logs/deploy/$EXPERIMENT_NAME/version_0/assembly_results/"
 
 if [ -d "$RESULTS_DIR" ]; then
-    python generate_viz.py \
+    python $GARF_REPO/generate_viz.py \
         --results_dir "$RESULTS_DIR" \
         --hdf5 input/juglet_deploy.hdf5 \
         --all --output_dir viz_output/juglet_deploy_proposed \

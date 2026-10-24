@@ -4,7 +4,7 @@
 #SBATCH --time=00:30:00
 #SBATCH --mem=32G
 #SBATCH --cpus-per-task=4
-#SBATCH --output=t0_panel_cpu_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/slurm/t0_panel_cpu_%j.out
 
 # T0 panel rescore (CPU only) — reuses an existing GARF deploy GLB.
 # Args: $1 = GARF GLB path, $2 = out dir tag suffix (default rerun),
@@ -12,7 +12,9 @@
 #       $4 = PF++ pc npz (default juglet_deploy val 00000.npz)
 
 set -euo pipefail
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 
 PF=/data/gpfs/projects/punim2657/Puzzlefusion
@@ -22,7 +24,7 @@ PFDIR=${3:-$PF/output/denoiser/everyday_epoch2000_bs64/inference/juglet_deploy/0
 PCNPZ=${4:-$PF/data/pc_data/juglet_deploy/val/00000.npz}
 TS=$(date +%Y%m%d_%H%M%S)
 
-python scripts/pfpp_layout_probes.py \
+python $GARF_REPO/scripts/pfpp_layout_probes.py \
     --pfpp-dir "$PFDIR" \
     --pc-npz   "$PCNPZ" \
     --mesh-hdf5 /data/gpfs/projects/punim2657/GARF/input/juglet_deploy.hdf5 --mesh-key artifact/Juglet-000 \

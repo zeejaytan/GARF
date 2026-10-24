@@ -5,7 +5,7 @@
 #SBATCH --time=05:00:00
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=12
-#SBATCH --output=exp15_selfsup_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/slurm/exp15_selfsup_%j.out
 
 # Exp 15 — Juglet-domain self-supervised encoder adaptation (the last
 # in-environment lever). Exp 14 ruled out sufficiency-by-geometric-inversion:
@@ -26,7 +26,9 @@
 # Env overrides: EPOCHS_SEG (60), EPOCHS_DEN (40), REPLICAS (80), INIT_CKPT.
 
 set -euo pipefail
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
 export PATH=$CUDA_HOME/bin:$PATH
@@ -53,7 +55,7 @@ with h5py.File(sys.argv[1], "r") as f:
 PY
 fi
 if [ "${MIX_OK}" != "1" ]; then
-    python scripts/build_juglet_selfsup_hdf5.py \
+    python $GARF_REPO/scripts/build_juglet_selfsup_hdf5.py \
         --juglet-source input/juglet_deploy_local02.hdf5 \
         --synth-source input/Fractura/bone_synthetic.hdf5 \
         --adjacency logs/diagnostics/juglet_adjacency/adjacency.json \
@@ -66,7 +68,7 @@ INIT_CKPT="${INIT_CKPT:-$(ls -t output/frac_seg_worn_*/feature_extractor_worn.ck
 [ -f "${INIT_CKPT}" ] || INIT_CKPT=output/feature_extractor.ckpt
 echo "init encoder: ${INIT_CKPT}"
 SEG_DIR=output/frac_seg_selfsup_${STAMP}
-python scripts/finetune_frac_seg.py \
+python $GARF_REPO/scripts/finetune_frac_seg.py \
     --init-ckpt "${INIT_CKPT}" \
     --data-root "${MIX}" \
     --categories pig hip leg rib vertebra artifact \
@@ -77,7 +79,7 @@ SS_CKPT=${SEG_DIR}/feature_extractor_worn.ckpt
 
 # ---------- Stage 3: probe gate (forgetting guard + perception readout) ----------
 PROBE=logs/diagnostics/exp15_probe_${STAMP}
-python scripts/fracseg_introspection.py \
+python $GARF_REPO/scripts/fracseg_introspection.py \
     --ckpt "${SS_CKPT}" \
     --synth-source input/Fractura/bone_synthetic.hdf5 \
     --synth-objects pig/synthetic_fracture/20/mode_5 \
@@ -107,12 +109,12 @@ fi
 
 # ---------- Stage 4: merge adapted encoder into GARF ----------
 MERGED=output/GARF_selfsup_encoder.ckpt
-python scripts/merge_worn_encoder.py --base output/GARF.ckpt \
+python $GARF_REPO/scripts/merge_worn_encoder.py --base output/GARF.ckpt \
     --worn "${SS_CKPT}" --out "${MERGED}"
 
 # ---------- Stage 5: denoiser co-adaptation (synthetic-only — Juglet has no GT poses) ----------
 COEXP="exp15_coadapt_${STAMP}"
-python train.py \
+python $GARF_REPO/train.py \
     experiment=denoiser_flow_matching \
     experiment_name="${COEXP}" \
     seed=42 \
@@ -140,7 +142,7 @@ RUN_DIRS=()
 for SEED in 41 42 43; do
     NAME="exp15_pairs_${STAMP}_s${SEED}"
     echo "--- eval pairs (self-sup adapted, seed=${SEED}) ---"
-    python eval.py \
+    python $GARF_REPO/eval.py \
         seed="${SEED}" experiment=denoiser_flow_matching \
         experiment_name="${NAME}" \
         loggers=csv loggers.csv.save_dir=logs/deploy \
@@ -159,7 +161,7 @@ for SEED in 41 42 43; do
 done
 
 OUT=logs/diagnostics/pair_chamfer_juglet_selfsup_${STAMP}
-python scripts/pair_reference_chamfer.py juglet \
+python $GARF_REPO/scripts/pair_reference_chamfer.py juglet \
     --run-dirs "${RUN_DIRS[@]}" \
     --pairs-hdf5 "${PAIR_HDF5}" \
     --adjacency logs/diagnostics/juglet_adjacency/adjacency.json \
@@ -167,7 +169,7 @@ python scripts/pair_reference_chamfer.py juglet \
     --out "${OUT}"
 
 echo "=== 9-piece Juglet deploy (self-sup adapted, GLB) ==="
-python eval.py \
+python $GARF_REPO/eval.py \
     seed=42 experiment=denoiser_flow_matching \
     experiment_name="exp15_j9pc_${STAMP}" \
     loggers=csv loggers.csv.save_dir=logs/deploy \

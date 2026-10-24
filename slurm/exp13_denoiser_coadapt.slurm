@@ -5,7 +5,7 @@
 #SBATCH --time=05:00:00
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=12
-#SBATCH --output=exp13_coadapt_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/slurm/exp13_coadapt_%j.out
 
 # Exp 13 — co-adapt the denoiser to the worn encoder (fixes the Exp 12 confound:
 # swapping only the encoder fed the denoiser features it was never trained on).
@@ -16,7 +16,9 @@
 # EPOCHS and SMOKE overridable via env: SMOKE=1 runs a 1-epoch shakeout.
 
 set -euo pipefail
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
 export PATH=$CUDA_HOME/bin:$PATH
@@ -33,7 +35,7 @@ echo "GPU: $(nvidia-smi --query-gpu=name --format=csv,noheader)"
 
 # Full denoiser fine-tune. finetuning=true loads GARF_worn_encoder.ckpt (worn
 # encoder stays frozen in DenoiserBase.__init__); denoiser params train.
-python train.py \
+python $GARF_REPO/train.py \
     experiment=denoiser_flow_matching \
     experiment_name="${EXP}" \
     seed=42 \
@@ -68,7 +70,7 @@ RUN_DIRS=()
 for SEED in 41 42 43; do
     NAME="${ETAG}_s${SEED}"
     echo "--- eval pairs (co-adapted, seed=${SEED}) ---"
-    python eval.py \
+    python $GARF_REPO/eval.py \
         seed="${SEED}" experiment=denoiser_flow_matching \
         experiment_name="${NAME}" \
         loggers=csv loggers.csv.save_dir=logs/deploy \
@@ -87,7 +89,7 @@ for SEED in 41 42 43; do
 done
 
 OUT=logs/diagnostics/pair_chamfer_juglet_coadapt_${STAMP}
-python scripts/pair_reference_chamfer.py juglet \
+python $GARF_REPO/scripts/pair_reference_chamfer.py juglet \
     --run-dirs "${RUN_DIRS[@]}" \
     --pairs-hdf5 "${PAIR_HDF5}" \
     --adjacency logs/diagnostics/juglet_adjacency/adjacency.json \

@@ -5,7 +5,7 @@
 #SBATCH --time=02:30:00
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=8
-#SBATCH --output=exp1c_initstep_vs_fullschedule_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/slurm/exp1c_initstep_vs_fullschedule_%j.out
 
 # Exp 1c — does one_step_init vs full-schedule change correctness on GT objects?
 # Runs BB (6pc, 9pc) and Fractura (pig 9pc) in BENCHMARK mode (deploy_mode=false,
@@ -18,9 +18,11 @@
 
 set -euo pipefail
 
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
-export PYTHONPATH="$PWD/scripts:${PYTHONPATH:-}"
+export PYTHONPATH="$GARF_REPO/scripts:${PYTHONPATH:-}"
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
 export PATH=$CUDA_HOME/bin:$PATH
 
@@ -41,7 +43,7 @@ echo "PREFIX=$PREFIX"
 # args: exp_name seed hdf5 one_step_init
 run_bench () {
     local exp_name="$1"; local seed="$2"; local hdf5="$3"; local osi="$4"
-    HYDRA_FULL_ERROR=1 python eval.py \
+    HYDRA_FULL_ERROR=1 python $GARF_REPO/eval.py \
         seed="${seed}" \
         experiment=denoiser_flow_matching \
         experiment_name="${exp_name}" \
@@ -71,7 +73,7 @@ do_label () {
     local label="$1"; local src="$2"; local key="$3"; local pieces="$4"
     local subset="${SUBSET_DIR}/${label}.hdf5"
     echo "=== build subset ${label} (${pieces} pc) ==="
-    python scripts/build_single_sample_subset.py \
+    python $GARF_REPO/scripts/build_single_sample_subset.py \
         --source "$src" --split-key "$key" --pieces "$pieces" --out "$subset"
     for SEED in 41 42 43; do
         echo "--- ${label} init1 seed=${SEED} ---"
@@ -86,7 +88,7 @@ do_label "bb_9pc"          "$BB_SRC" "everyday" 9
 do_label "fractura_pig_9pc" "$FR_SRC" "pig"      9
 
 echo "=== aggregate ==="
-python scripts/summarize_benchmark_metrics.py \
+python $GARF_REPO/scripts/summarize_benchmark_metrics.py \
     --root logs/diagnostics --prefix "$PREFIX" --out "$OUT"
 
 echo "Summary: $OUT/summary.md"

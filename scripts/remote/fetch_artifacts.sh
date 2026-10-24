@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Rsync a relative path from the Spartan GARF tree to a local directory.
+# Rsync a relative path from the Spartan GARF working area to a local directory.
 # Usage: ./scripts/remote/fetch_artifacts.sh <remote-relpath> [local-dir]
 set -euo pipefail
 
 SPARTAN_HOST="${SPARTAN_HOST:-spartan}"
-REMOTE_ROOT="${REMOTE_ROOT:-/data/gpfs/projects/punim2657/GARF}"
+REMOTE_ROOT="${REMOTE_ROOT:-/data/gpfs/projects/punim2657/GARF}"  # the working area: logs/, output/
 
 if [[ $# -lt 1 ]]; then
   echo "Usage: $0 <remote-relpath> [local-dir]" >&2

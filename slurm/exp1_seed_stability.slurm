@@ -5,7 +5,7 @@
 #SBATCH --time=01:30:00
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=8
-#SBATCH --output=exp1_seed_stability_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/slurm/exp1_seed_stability_%j.out
 
 # Exp 1 — seed/anchor stability discriminator for "why GARF fails on Juglet".
 # Runs the SAME Juglet object several times with different seeds (and a
@@ -17,7 +17,9 @@
 
 set -euo pipefail
 
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
@@ -37,7 +39,7 @@ echo "GPU: $(nvidia-smi --query-gpu=name --format=csv,noheader)"
 run_eval () {
     local exp_name="$1"; local seed="$2"; local rand_anchor="$3"
     echo "--- run ${exp_name} (seed=${seed}, random_anchor=${rand_anchor}) ---"
-    HYDRA_FULL_ERROR=1 python eval.py \
+    HYDRA_FULL_ERROR=1 python $GARF_REPO/eval.py \
         seed="${seed}" \
         experiment=denoiser_flow_matching \
         experiment_name="${exp_name}" \
@@ -77,12 +79,12 @@ for SEED in 42 43 44; do
 done
 
 echo "=== Stability probe (fixed-anchor seeds only) ==="
-python scripts/no_gt_probes.py stability \
+python $GARF_REPO/scripts/no_gt_probes.py stability \
     --jsons "${JSONS[@]:0:6}" \
     --out "$PROBE_OUT" --tag stability_fixed_anchor
 
 echo "=== Stability probe (all runs incl. random anchor) ==="
-python scripts/no_gt_probes.py stability \
+python $GARF_REPO/scripts/no_gt_probes.py stability \
     --jsons "${JSONS[@]}" \
     --out "$PROBE_OUT" --tag stability_all
 
@@ -90,7 +92,7 @@ echo "=== Contact probe per run (descriptive context) ==="
 for SEED in 41 42 43 44 45 46; do
     NAME="${TAGROOT}_s${SEED}"
     GLB="logs/deploy/${NAME}/version_0/assembly_results/artifact/Juglet-000/predicted_assembly.glb"
-    python scripts/no_gt_probes.py contact --glb "$GLB" --out "$PROBE_OUT" --tag "contact_s${SEED}" || true
+    python $GARF_REPO/scripts/no_gt_probes.py contact --glb "$GLB" --out "$PROBE_OUT" --tag "contact_s${SEED}" || true
 done
 
 echo "Probe outputs: $PROBE_OUT"

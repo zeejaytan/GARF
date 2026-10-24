@@ -5,7 +5,7 @@
 #SBATCH --time=03:00:00
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=8
-#SBATCH --output=exp7b_erosion_radius_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/slurm/exp7b_erosion_radius_%j.out
 
 # Exp 7b — RIM-EROSION BRIDGE, KERNEL-RADIUS SWEEP (break the relief plateau).
 #
@@ -32,7 +32,9 @@
 
 set -euo pipefail
 
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
@@ -70,7 +72,7 @@ for RT in "0.10 r010 192" "0.15 r015 432" "0.20 r020 768"; do
 
     echo ""
     echo "=== mollify radius ${KFRAC} (knn ${KNN}) ==="
-    python scripts/build_control_pairs_hdf5.py \
+    python $GARF_REPO/scripts/build_control_pairs_hdf5.py \
         --source "$SRC_HDF5" \
         --objects ceramics/pink_bowl ceramics/narrow_bottle2 \
                   ceramics/narrow_bottle4 ceramics/blue_pot \
@@ -85,7 +87,7 @@ for RT in "0.10 r010 192" "0.15 r015 432" "0.20 r020 768"; do
     for SEED in 41 42 43; do
         NAME="exp7b_radius_${STAMP}_${TAG}_s${SEED}"
         echo "--- eval eroded pairs (radius=${KFRAC}, seed=${SEED}) ---"
-        HYDRA_FULL_ERROR=1 python eval.py \
+        HYDRA_FULL_ERROR=1 python $GARF_REPO/eval.py \
             seed="${SEED}" \
             experiment=denoiser_flow_matching \
             experiment_name="${NAME}" \
@@ -112,7 +114,7 @@ for RT in "0.10 r010 192" "0.15 r015 432" "0.20 r020 768"; do
     done
 
     echo "--- symmetry-invariant chamfer scoring (radius=${KFRAC}) ---"
-    python scripts/pair_reference_chamfer.py control \
+    python $GARF_REPO/scripts/pair_reference_chamfer.py control \
         --run-dirs "${RUN_DIRS[@]}" \
         --pairs-hdf5 "$PAIR_HDF5" \
         --adjacency "$ADJ" \
@@ -127,7 +129,7 @@ done
 
 echo ""
 echo "=== Exp 7b bridge summary ==="
-python scripts/summarize_erosion_bridge.py \
+python $GARF_REPO/scripts/summarize_erosion_bridge.py \
     "${SUMMARY_ENTRIES[@]}" \
     --x-label "mollify radius / piece scale" \
     --out "$OUT_ROOT"

@@ -5,7 +5,7 @@
 #SBATCH --time=03:00:00
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=8
-#SBATCH --output=exp12_wornasm_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/slurm/exp12_wornasm_%j.out
 
 # Exp 12 — does the worn-adapted encoder let GARF assemble the Juglet?
 # Swap ONLY the encoder in GARF.ckpt for the Exp 11 worn fine-tuned one, then
@@ -15,7 +15,9 @@
 # separate from non-mates -> GARF now perceives Juglet mates.
 
 set -euo pipefail
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
 export PATH=$CUDA_HOME/bin:$PATH
@@ -30,7 +32,7 @@ echo "=== Exp 12: Juglet assembly with worn encoder ==="; date
 echo "worn encoder: ${WORN_CKPT}"
 
 MERGED=output/GARF_worn_encoder.ckpt
-python scripts/merge_worn_encoder.py --base output/GARF.ckpt --worn "${WORN_CKPT}" --out "${MERGED}"
+python $GARF_REPO/scripts/merge_worn_encoder.py --base output/GARF.ckpt --worn "${WORN_CKPT}" --out "${MERGED}"
 
 PAIR_HDF5=input/juglet_pairs_local02.hdf5
 STAMP=$(date +%Y%m%d_%H%M%S)
@@ -42,7 +44,7 @@ RUN_DIRS=()
 for SEED in 41 42 43; do
     NAME="${TAGROOT}_s${SEED}"
     echo "--- eval all pairs with worn encoder (seed=${SEED}) ---"
-    python eval.py \
+    python $GARF_REPO/eval.py \
         seed="${SEED}" \
         experiment=denoiser_flow_matching \
         experiment_name="${NAME}" \
@@ -64,7 +66,7 @@ done
 
 OUT=logs/diagnostics/pair_chamfer_juglet_worn_${STAMP}
 echo "=== symmetry-invariant chamfer scoring (worn encoder) ==="
-python scripts/pair_reference_chamfer.py juglet \
+python $GARF_REPO/scripts/pair_reference_chamfer.py juglet \
     --run-dirs "${RUN_DIRS[@]}" \
     --pairs-hdf5 "${PAIR_HDF5}" \
     --adjacency logs/diagnostics/juglet_adjacency/adjacency.json \
@@ -73,7 +75,7 @@ python scripts/pair_reference_chamfer.py juglet \
     --out "${OUT}"
 
 echo "=== full 9-piece Juglet deploy with worn encoder (GLB) ==="
-python eval.py \
+python $GARF_REPO/eval.py \
     seed=42 experiment=denoiser_flow_matching \
     experiment_name="exp12_j9pc_${STAMP}" \
     loggers=csv loggers.csv.save_dir=logs/deploy \

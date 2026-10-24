@@ -156,7 +156,7 @@ def run_eval(
 ) -> Path:
     cmd = [
         "python",
-        "eval.py",
+        str(Path(__file__).resolve().parents[1] / "eval.py"),  # code in repo/, cwd = working area
         f"seed={seed}",
         "experiment=denoiser_flow_matching",
         f"experiment_name={experiment_name}",

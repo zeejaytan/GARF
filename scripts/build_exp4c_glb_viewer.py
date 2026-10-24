@@ -20,8 +20,9 @@ import re
 import shutil
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "viz_output" / "exp4c_thinwall"
+# Data and outputs live in the working area; this file lives in its repo/ (GARF ticket 01).
+WORK = Path(os.environ.get("GARF_WORK", "/data/gpfs/projects/punim2657/GARF"))
+OUT = WORK / "viz_output" / "exp4c_thinwall"
 THREE_CDN = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"
 ORBIT_CDN = "https://unpkg.com/three@0.134.0/examples/js/controls/OrbitControls.js"
 GLTF_CDN = "https://unpkg.com/three@0.134.0/examples/js/loaders/GLTFLoader.js"
@@ -39,7 +40,7 @@ def load_asset(out_dir: Path, name: str, url: str) -> str:
 def find_metrics(thinwall_stamp: str) -> dict[str, dict]:
     """Map 'category/sample' -> metrics from seed-41 JSON."""
     metrics: dict[str, dict] = {}
-    diag = ROOT / "logs" / "diagnostics"
+    diag = WORK / "logs" / "diagnostics"
     for run_dir in sorted(diag.glob(f"thinwall_{thinwall_stamp}_*_init1_s41")):
         m = re.match(rf"thinwall_{thinwall_stamp}_(?P<cat>\w+)_init1_s41", run_dir.name)
         if not m:
@@ -62,7 +63,7 @@ def find_metrics(thinwall_stamp: str) -> dict[str, dict]:
 
 def collect_glb_samples(thinviz_stamp: str) -> list[dict]:
     samples = []
-    deploy = ROOT / "logs" / "deploy"
+    deploy = WORK / "logs" / "deploy"
     for cat_dir in sorted(deploy.glob(f"thinviz_{thinviz_stamp}_*")):
         cat = cat_dir.name.split(f"thinviz_{thinviz_stamp}_", 1)[-1]
         asm_root = cat_dir / "version_0" / "assembly_results" / cat

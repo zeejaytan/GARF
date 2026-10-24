@@ -5,7 +5,7 @@
 #SBATCH --time=02:30:00
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=8
-#SBATCH --output=exp1b_reference_stability_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/slurm/exp1b_reference_stability_%j.out
 
 # Exp 1b — known-good reference baseline for the stability/contact probes.
 # Runs BB (6- and 9-piece) and Fractura (9-piece) objects that GARF assembles
@@ -15,9 +15,11 @@
 
 set -euo pipefail
 
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
-export PYTHONPATH="$PWD/scripts:${PYTHONPATH:-}"
+export PYTHONPATH="$GARF_REPO/scripts:${PYTHONPATH:-}"
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
 export PATH=$CUDA_HOME/bin:$PATH
 
@@ -32,7 +34,7 @@ FR_SRC=input/Fractura/bone_synthetic.hdf5
 
 run_eval () {
     local exp_name="$1"; local seed="$2"; local hdf5="$3"
-    HYDRA_FULL_ERROR=1 python eval.py \
+    HYDRA_FULL_ERROR=1 python $GARF_REPO/eval.py \
         seed="${seed}" \
         experiment=denoiser_flow_matching \
         experiment_name="${exp_name}" \
@@ -63,7 +65,7 @@ do_reference () {
     local subset="${SUBSET_DIR}/${label}.hdf5"
     echo "=== Reference ${label} (${pieces} pieces) ==="
     local out
-    out=$(python scripts/build_single_sample_subset.py \
+    out=$(python $GARF_REPO/scripts/build_single_sample_subset.py \
             --source "$src" --split-key "$key" --pieces "$pieces" --out "$subset")
     echo "$out"
     local sample
@@ -77,12 +79,12 @@ do_reference () {
         jsons+=("logs/deploy/${name}/version_0/assembly_results/${sample}/predicted_assembly.json")
     done
 
-    python scripts/no_gt_probes.py stability \
+    python $GARF_REPO/scripts/no_gt_probes.py stability \
         --jsons "${jsons[@]}" \
         --out "$PROBE_ROOT" --tag "stability_${label}"
 
     local glb="logs/deploy/ref_${label}_${STAMP}_s42/version_0/assembly_results/${sample}/predicted_assembly.glb"
-    python scripts/no_gt_probes.py contact --glb "$glb" --out "$PROBE_ROOT" --tag "contact_${label}" || true
+    python $GARF_REPO/scripts/no_gt_probes.py contact --glb "$glb" --out "$PROBE_ROOT" --tag "contact_${label}" || true
 }
 
 echo "Date: $(date)"

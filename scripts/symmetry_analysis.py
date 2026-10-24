@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import glob
 import json
+import os
 from pathlib import Path
 
 import numpy as np
@@ -24,7 +25,8 @@ import trimesh
 from scipy.spatial import cKDTree
 from scipy.spatial.transform import Rotation as R
 
-ROOT = Path(__file__).resolve().parents[1]
+# Data and outputs live in the working area; this file lives in its repo/ (GARF ticket 01).
+WORK = Path(os.environ.get("GARF_WORK", "/data/gpfs/projects/punim2657/GARF"))
 
 
 def assembled_points(glb_path: Path, n: int = 4000) -> np.ndarray:
@@ -91,7 +93,7 @@ def main() -> None:
         metrics[j["name"]] = j
 
     rows = []
-    deploy = ROOT / "logs" / "deploy"
+    deploy = WORK / "logs" / "deploy"
     for cat_dir in sorted(deploy.glob(f"thinviz_{args.thinviz_stamp}_*")):
         cat = cat_dir.name.split(f"thinviz_{args.thinviz_stamp}_", 1)[-1]
         asm = cat_dir / "version_0" / "assembly_results" / cat
@@ -125,7 +127,7 @@ def main() -> None:
     if len(rows) > 2:
         corr = float(np.corrcoef(sym, acc)[0, 1])
         print(f"\nPearson r(axisym, part_acc) = {corr:.3f}  (positive => more symmetric -> lower acc)")
-    out = ROOT / "logs" / "diagnostics" / "symmetry_analysis.json"
+    out = WORK / "logs" / "diagnostics" / "symmetry_analysis.json"
     out.write_text(json.dumps(rows, indent=2))
     print(f"Wrote {out}")
 

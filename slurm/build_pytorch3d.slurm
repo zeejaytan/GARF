@@ -4,9 +4,11 @@
 #SBATCH --time=01:00:00
 #SBATCH --mem=32G
 #SBATCH --cpus-per-task=8
-#SBATCH --output=build_pytorch3d_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/slurm/build_pytorch3d_%j.out
 
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
@@ -36,7 +38,7 @@ cd $BUILD_DIR
 # Build and install (non-editable)
 python setup.py install 2>&1
 
-cd /data/gpfs/projects/punim2657/GARF
+cd "$GARF_WORK"
 
 echo ""
 echo "=== VERIFICATION ==="

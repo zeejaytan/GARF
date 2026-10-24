@@ -1,11 +1,15 @@
 #!/bin/bash
 #SBATCH --job-name=garf_bone_real
-#SBATCH --output=garf_bone_real_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/slurm/garf_bone_real_%j.out
 #SBATCH --partition=gpu-a100
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
 #SBATCH --time=01:00:00
+
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 
 echo "=== TESTING GARF ON REAL BONE FRACTURES ==="
 echo "Dataset: input/Fractura/bone_real.hdf5 (pig_bone category)"
@@ -19,7 +23,7 @@ echo "Starting GARF evaluation on real bone fractures..."
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 
 # Run evaluation
-HYDRA_FULL_ERROR=1 python eval.py \
+HYDRA_FULL_ERROR=1 python $GARF_REPO/eval.py \
     experiment=denoiser_flow_matching \
     data.data_root=input/Fractura/bone_real.hdf5 \
     data.categories="[pig_bone]" \

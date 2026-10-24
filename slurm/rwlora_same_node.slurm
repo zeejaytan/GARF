@@ -5,7 +5,7 @@
 #SBATCH --time=05:00:00
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=12
-#SBATCH --output=logs/rwlora/rwlora_%x_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/rwlora/rwlora_%x_%j.out
 
 # .scratch/rough-worn-dose ticket 05: every arm on ONE GPU node, so node-to-node
 # differences (up to 0.15 sherd per attempt, ticket 03) cannot decide the comparison.
@@ -15,9 +15,11 @@
 #        narrowest ticket-02 wins, plus its one loss)
 
 set -euo pipefail
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 echo "=== same-node run on $(hostname) $(date) ==="
-run() { env "$@" bash slurm/rwlora_arm.slurm || echo "ARM FAILED: $*"; }
+run() { env "$@" bash $GARF_REPO/slurm/rwlora_arm.slurm || echo "ARM FAILED: $*"; }
 P10="1 2 3 4 5 6 7 8 9 10"
 S2="juglet_gt fractura_fresh"
 run ARM=fresh_s7 ADAPTER=output/rwlora_fresh_s7_31482030/last.ckpt     DRAW_SEEDS="$P10" SETS="$S2"

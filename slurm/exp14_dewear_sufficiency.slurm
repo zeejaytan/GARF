@@ -5,7 +5,7 @@
 #SBATCH --time=04:00:00
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=8
-#SBATCH --output=exp14_dewear_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/slurm/exp14_dewear_%j.out
 
 # Exp 14 — de-weathering sufficiency test ("un-wear the Juglet").
 # Proves the encoder-blindness cause in the SUFFICIENCY direction, on the
@@ -24,7 +24,9 @@
 # RUN_CTRL_REGRESSION=1 adds arm D (de-weathered control ceramics must stay good).
 
 set -euo pipefail
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
 export PATH=$CUDA_HOME/bin:$PATH
@@ -37,7 +39,7 @@ echo "=== Exp 14 de-weathering sufficiency ==="; date
 
 # ---------- Stage A: perception sweep (band) + arm C (offband specificity) ----------
 PROBE_BAND=logs/diagnostics/exp14_probe_band_${STAMP}
-python scripts/exp14_dewear_sufficiency.py probe \
+python $GARF_REPO/scripts/exp14_dewear_sufficiency.py probe \
     --ckpt output/feature_extractor.ckpt \
     --juglet-mesh-dir "${MESH_DIR}" \
     --control-source input/Fractura/fractura_real.hdf5 \
@@ -46,7 +48,7 @@ python scripts/exp14_dewear_sufficiency.py probe \
     --out "${PROBE_BAND}"
 
 PROBE_OFF=logs/diagnostics/exp14_probe_offband_${STAMP}
-python scripts/exp14_dewear_sufficiency.py probe \
+python $GARF_REPO/scripts/exp14_dewear_sufficiency.py probe \
     --ckpt output/feature_extractor.ckpt \
     --juglet-mesh-dir "${MESH_DIR}" \
     --strengths 2.0 --region offband \
@@ -71,9 +73,9 @@ echo "=== arm A gate PASSED: best de-weathering strength ${BEST} ==="
 # ---------- Stage B: de-weathered pairs, 3-seed oracle, chamfer scoring ----------
 DEPLOY_DW=input/juglet_deploy_dewear.hdf5
 PAIRS_DW=input/juglet_pairs_dewear.hdf5
-python scripts/exp14_dewear_sufficiency.py build \
+python $GARF_REPO/scripts/exp14_dewear_sufficiency.py build \
     --source input/juglet_deploy_local02.hdf5 --strength "${BEST}" --out "${DEPLOY_DW}"
-python scripts/build_juglet_pairs_hdf5.py --source "${DEPLOY_DW}" --out "${PAIRS_DW}"
+python $GARF_REPO/scripts/build_juglet_pairs_hdf5.py --source "${DEPLOY_DW}" --out "${PAIRS_DW}"
 
 # Model arms: baseline GARF + (optional) Exp 13 co-adapted stack.
 declare -A ARMS=( [base]=output/GARF.ckpt )
@@ -89,7 +91,7 @@ for ARM in "${!ARMS[@]}"; do
     for SEED in 41 42 43; do
         NAME="exp14_dwpairs_${ARM}_${STAMP}_s${SEED}"
         echo "--- eval de-weathered pairs (${ARM}, seed=${SEED}) ---"
-        python eval.py \
+        python $GARF_REPO/eval.py \
             seed="${SEED}" \
             experiment=denoiser_flow_matching \
             experiment_name="${NAME}" \
@@ -111,7 +113,7 @@ for ARM in "${!ARMS[@]}"; do
 
     OUT=logs/diagnostics/pair_chamfer_juglet_dewear_${ARM}_${STAMP}
     echo "=== chamfer scoring (${ARM}) — reference = original geometry ==="
-    python scripts/pair_reference_chamfer.py juglet \
+    python $GARF_REPO/scripts/pair_reference_chamfer.py juglet \
         --run-dirs "${RUN_DIRS[@]}" \
         --pairs-hdf5 input/juglet_pairs_local02.hdf5 \
         --adjacency logs/diagnostics/juglet_adjacency/adjacency.json \
@@ -120,7 +122,7 @@ for ARM in "${!ARMS[@]}"; do
         --out "${OUT}"
 
     echo "=== 9-piece de-weathered Juglet deploy (${ARM}, GLB) ==="
-    python eval.py \
+    python $GARF_REPO/eval.py \
         seed=42 experiment=denoiser_flow_matching \
         experiment_name="exp14_j9pc_${ARM}_${STAMP}" \
         loggers=csv loggers.csv.save_dir=logs/deploy \
@@ -144,12 +146,12 @@ done
 # ---------- Arm D (optional): control-ceramics regression ----------
 if [ "${RUN_CTRL_REGRESSION:-0}" = "1" ]; then
     CTRL_DW=input/control_ceramics_pairs_dewear.hdf5
-    python scripts/exp14_dewear_sufficiency.py build \
+    python $GARF_REPO/scripts/exp14_dewear_sufficiency.py build \
         --source input/control_ceramics_pairs.hdf5 --strength "${BEST}" --out "${CTRL_DW}"
     RUN_DIRS=()
     for SEED in 41 42 43; do
         NAME="exp14_ctrlpairs_${STAMP}_s${SEED}"
-        python eval.py \
+        python $GARF_REPO/eval.py \
             seed="${SEED}" \
             experiment=denoiser_flow_matching \
             experiment_name="${NAME}" \
@@ -168,7 +170,7 @@ if [ "${RUN_CTRL_REGRESSION:-0}" = "1" ]; then
             ++model.inference_config.save_assembly=true
         RUN_DIRS+=("logs/deploy/${NAME}")
     done
-    python scripts/pair_reference_chamfer.py control \
+    python $GARF_REPO/scripts/pair_reference_chamfer.py control \
         --run-dirs "${RUN_DIRS[@]}" \
         --pairs-hdf5 input/control_ceramics_pairs.hdf5 \
         --adjacency logs/diagnostics/control_ceramics_adjacency.json \

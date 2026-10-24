@@ -5,7 +5,7 @@
 #SBATCH --time=01:00:00
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=8
-#SBATCH --output=t0_layout_panel_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/slurm/t0_layout_panel_%j.out
 
 # T0 — like-for-like layout quality panel (PFPP_JUGLET_SUCCESS_EXPERIMENT_PLAN.md).
 # Step 1: fresh baseline-GARF deploy on the ORIGINAL juglet (fixed GLB export)
@@ -15,7 +15,9 @@
 #         permuted nulls with scripts/pfpp_layout_probes.py.
 
 set -euo pipefail
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
@@ -26,7 +28,7 @@ EXPERIMENT_NAME="t0_garf_base_${TS}"
 PF=/data/gpfs/projects/punim2657/Puzzlefusion
 
 echo "=== T0 step 1: baseline GARF deploy on original juglet ==="
-HYDRA_FULL_ERROR=1 python eval.py \
+HYDRA_FULL_ERROR=1 python $GARF_REPO/eval.py \
     seed=42 \
     experiment=denoiser_flow_matching \
     experiment_name=$EXPERIMENT_NAME \
@@ -54,7 +56,7 @@ GLB="logs/deploy/$EXPERIMENT_NAME/version_0/assembly_results/artifact/Juglet-000
 ls -l "$GLB"
 
 echo "=== T0 step 2: layout panel ==="
-python scripts/pfpp_layout_probes.py \
+python $GARF_REPO/scripts/pfpp_layout_probes.py \
     --pfpp-dir "$PF/output/denoiser/everyday_epoch2000_bs64/inference/juglet_deploy/0" \
     --pc-npz   "$PF/data/pc_data/juglet_deploy/val/00000.npz" \
     --mesh-hdf5 /data/gpfs/projects/punim2657/GARF/input/juglet_deploy.hdf5 --mesh-key artifact/Juglet-000 \

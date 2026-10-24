@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import glob
+import os
 from pathlib import Path
 
 import h5py
@@ -25,7 +26,8 @@ import numpy as np
 import trimesh
 from scipy.spatial import cKDTree
 
-ROOT = Path(__file__).resolve().parents[1]
+# Data and outputs live in the working area; this file lives in its repo/ (GARF ticket 01).
+WORK = Path(os.environ.get("GARF_WORK", "/data/gpfs/projects/punim2657/GARF"))
 
 
 def iter_pieces_h5(group):
@@ -111,9 +113,9 @@ def main():
     rng = np.random.default_rng(0)
 
     datasets = [
-        ("Juglet", ROOT / "input/juglet_deploy.hdf5", "juglet_deploy"),
-        ("Fractura-ceramics", ROOT / "input/Fractura/fractura_real.hdf5", "ceramics"),
-        ("Fractura-egg", ROOT / "input/Fractura/fractura_real.hdf5", "egg"),
+        ("Juglet", WORK / "input/juglet_deploy.hdf5", "juglet_deploy"),
+        ("Fractura-ceramics", WORK / "input/Fractura/fractura_real.hdf5", "ceramics"),
+        ("Fractura-egg", WORK / "input/Fractura/fractura_real.hdf5", "egg"),
         ("BB-everyday", Path("/data/gpfs/projects/punim2657/TORA/dataset/breaking_bad_vol.hdf5"), "everyday"),
     ]
     all_rows = {}

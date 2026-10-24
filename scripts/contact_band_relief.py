@@ -18,13 +18,15 @@ import argparse
 import glob
 import json
 from itertools import combinations
+import os
 from pathlib import Path
 
 import numpy as np
 import trimesh
 from scipy.spatial import cKDTree
 
-ROOT = Path(__file__).resolve().parents[1]
+# Data and outputs live in the working area; this file lives in its repo/ (GARF ticket 01).
+WORK = Path(os.environ.get("GARF_WORK", "/data/gpfs/projects/punim2657/GARF"))
 
 
 def part_samples(glb_path: Path, n_per: int = 4000):
@@ -103,7 +105,7 @@ def main():
 
     rows = []
     for cat in ["ceramics", "egg", "bones"]:
-        base = ROOT / f"logs/deploy/thinviz_{args.thinviz_stamp}_{cat}/version_0/assembly_results/{cat}"
+        base = WORK / f"logs/deploy/thinviz_{args.thinviz_stamp}_{cat}/version_0/assembly_results/{cat}"
         if not base.is_dir():
             continue
         for sd in sorted(base.iterdir()):
@@ -134,7 +136,7 @@ def main():
         a = np.array([r["part_acc"] for r in g]); b = np.array([r["band_relief_w"] for r in g])
         if len(g) > 2:
             print(f"\nr(bandRelief, part_acc) [{grp}] = {np.corrcoef(b, a)[0,1]:.3f}")
-    (ROOT / "logs/diagnostics/contact_band_relief.json").write_text(json.dumps(rows, indent=2))
+    (WORK / "logs/diagnostics/contact_band_relief.json").write_text(json.dumps(rows, indent=2))
 
 
 if __name__ == "__main__":

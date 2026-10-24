@@ -5,7 +5,7 @@
 #SBATCH --time=02:00:00
 #SBATCH --mem=96G
 #SBATCH --cpus-per-task=8
-#SBATCH --output=exp4c_real_thinwall_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/slurm/exp4c_real_thinwall_%j.out
 
 # Exp 4c — control for the user's challenge: BB/Fractura DO contain real thin-walled
 # objects (Fractura_real: egg fill~0.02, ceramics fill~0.08-0.18 ~ Juglet's 0.13).
@@ -16,9 +16,11 @@
 
 set -euo pipefail
 
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
-export PYTHONPATH="$PWD/scripts:${PYTHONPATH:-}"
+export PYTHONPATH="$GARF_REPO/scripts:${PYTHONPATH:-}"
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
 export PATH=$CUDA_HOME/bin:$PATH
 
@@ -33,7 +35,7 @@ echo "Date: $(date)"; echo "GPU: $(nvidia-smi --query-gpu=name --format=csv,nohe
 
 run_bench () {
     local exp="$1"; local seed="$2"; local cat="$3"
-    HYDRA_FULL_ERROR=1 python eval.py \
+    HYDRA_FULL_ERROR=1 python $GARF_REPO/eval.py \
         seed="${seed}" experiment=denoiser_flow_matching experiment_name="${exp}" \
         loggers=csv loggers.csv.save_dir=logs/diagnostics \
         trainer.num_nodes=1 trainer.devices=1 trainer.precision=bf16-mixed \
@@ -55,7 +57,7 @@ for CAT in egg ceramics bones; do
 done
 
 echo "=== aggregate ==="
-python scripts/summarize_benchmark_metrics.py --root logs/diagnostics --prefix "$PREFIX" --out "$OUT" || \
+python $GARF_REPO/scripts/summarize_benchmark_metrics.py --root logs/diagnostics --prefix "$PREFIX" --out "$OUT" || \
     echo "(summarizer prefix-mode may differ; raw CSVs under logs/diagnostics/${PREFIX}_*)"
 echo "Summary dir: $OUT"
 echo "=== DONE ==="

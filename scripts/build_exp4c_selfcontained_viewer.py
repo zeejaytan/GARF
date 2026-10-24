@@ -14,16 +14,19 @@ import argparse
 import json
 import re
 import sys
+import os
 from pathlib import Path
 
 import numpy as np
 import trimesh
 
 ROOT = Path(__file__).resolve().parents[1]
+# Data and outputs live in the working area; this file lives in its repo/ (GARF ticket 01).
+WORK = Path(os.environ.get("GARF_WORK", "/data/gpfs/projects/punim2657/GARF"))
 sys.path.insert(0, str(ROOT))
 from generate_viz import THREEJS_CDN, ORBIT_CDN, load_asset  # noqa: E402
 
-OUT = ROOT / "viz_output" / "exp4c_thinwall"
+OUT = WORK / "viz_output" / "exp4c_thinwall"
 PTS_PER_PART = 600
 COLORS = [
     "#4ade80", "#60a5fa", "#f472b6", "#fbbf24", "#a78bfa",
@@ -69,7 +72,7 @@ def sample_glb_parts(glb_path: Path, pts_per_part: int) -> list[list[float]]:
 
 def find_metrics(thinwall_stamp: str) -> dict[str, dict]:
     metrics: dict[str, dict] = {}
-    diag = ROOT / "logs" / "diagnostics"
+    diag = WORK / "logs" / "diagnostics"
     for run_dir in sorted(diag.glob(f"thinwall_{thinwall_stamp}_*_init1_s41")):
         for jpath in sorted((run_dir / "version_0" / "json_results").glob("*.json")):
             j = json.loads(jpath.read_text())
@@ -79,7 +82,7 @@ def find_metrics(thinwall_stamp: str) -> dict[str, dict]:
 
 def collect_samples(thinviz_stamp: str) -> list[dict]:
     samples = []
-    deploy = ROOT / "logs" / "deploy"
+    deploy = WORK / "logs" / "deploy"
     for cat_dir in sorted(deploy.glob(f"thinviz_{thinviz_stamp}_*")):
         cat = cat_dir.name.split(f"thinviz_{thinviz_stamp}_", 1)[-1]
         asm_root = cat_dir / "version_0" / "assembly_results" / cat

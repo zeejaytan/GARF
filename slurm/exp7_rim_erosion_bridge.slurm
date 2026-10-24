@@ -5,7 +5,7 @@
 #SBATCH --time=03:00:00
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=8
-#SBATCH --output=exp7_rim_erosion_bridge_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/slurm/exp7_rim_erosion_bridge_%j.out
 
 # Exp 7 — RIM-EROSION DOMAIN BRIDGE (decisive confirmation of the Juglet
 # root cause, per JUGLET_ROOTCAUSE_FINDINGS.md).
@@ -22,7 +22,9 @@
 
 set -euo pipefail
 
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
@@ -49,7 +51,7 @@ for ST in "0.00 000" "0.25 025" "0.50 050" "0.75 075" "1.00 100"; do
 
     echo ""
     echo "=== strength ${STRENGTH} (tag ${TAG}) ==="
-    python scripts/build_control_pairs_hdf5.py \
+    python $GARF_REPO/scripts/build_control_pairs_hdf5.py \
         --source "$SRC_HDF5" \
         --objects ceramics/pink_bowl ceramics/narrow_bottle2 \
                   ceramics/narrow_bottle4 ceramics/blue_pot \
@@ -62,7 +64,7 @@ for ST in "0.00 000" "0.25 025" "0.50 050" "0.75 075" "1.00 100"; do
     for SEED in 41 42 43; do
         NAME="exp7_erode_${STAMP}_e${TAG}_s${SEED}"
         echo "--- eval eroded pairs (strength=${STRENGTH}, seed=${SEED}) ---"
-        HYDRA_FULL_ERROR=1 python eval.py \
+        HYDRA_FULL_ERROR=1 python $GARF_REPO/eval.py \
             seed="${SEED}" \
             experiment=denoiser_flow_matching \
             experiment_name="${NAME}" \
@@ -89,7 +91,7 @@ for ST in "0.00 000" "0.25 025" "0.50 050" "0.75 075" "1.00 100"; do
     done
 
     echo "--- symmetry-invariant chamfer scoring (strength=${STRENGTH}) ---"
-    python scripts/pair_reference_chamfer.py control \
+    python $GARF_REPO/scripts/pair_reference_chamfer.py control \
         --run-dirs "${RUN_DIRS[@]}" \
         --pairs-hdf5 "$PAIR_HDF5" \
         --adjacency "$ADJ" \
@@ -104,7 +106,7 @@ done
 
 echo ""
 echo "=== Exp 7 bridge summary ==="
-python scripts/summarize_erosion_bridge.py \
+python $GARF_REPO/scripts/summarize_erosion_bridge.py \
     "${SUMMARY_ENTRIES[@]}" \
     --out "$OUT_ROOT"
 

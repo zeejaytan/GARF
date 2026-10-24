@@ -5,7 +5,7 @@
 #SBATCH --time=00:40:00
 #SBATCH --mem=48G
 #SBATCH --cpus-per-task=8
-#SBATCH --output=exp10_fracseg_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/slurm/exp10_fracseg_%j.out
 
 # Exp 10 — look INSIDE GARF's frozen fracture-aware encoder.
 # Does the pretrained backbone (which feeds the denoiser) recognize Juglet's worn
@@ -13,7 +13,9 @@
 # synthetic fractures; fresh real ceramics vs worn Juglet compared via the
 # assembly-free relief-band detector.
 
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
@@ -27,7 +29,7 @@ echo "=== Exp 10 FracSeg introspection ==="
 echo "Date: $(date)"
 echo "GPU: $(nvidia-smi --query-gpu=name --format=csv,noheader)"
 
-python scripts/fracseg_introspection.py \
+python $GARF_REPO/scripts/fracseg_introspection.py \
     --ckpt output/feature_extractor.ckpt \
     --synth-source input/Fractura/bone_synthetic.hdf5 \
     --synth-objects pig/synthetic_fracture/20/mode_5 \

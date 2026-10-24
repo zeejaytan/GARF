@@ -1,11 +1,15 @@
 #!/bin/bash
 #SBATCH --job-name=bone_test_fixed
-#SBATCH --output=bone_test_fixed_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/slurm/bone_test_fixed_%j.out
 #SBATCH --partition=gpu-a100
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
 #SBATCH --time=01:00:00
+
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 
 echo "=== BONE TEST WITH FIXED CONFIGURATION ==="
 echo "Dataset: input/Fractura/bone_real.hdf5"
@@ -16,7 +20,7 @@ source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF
 
 echo "Starting fixed bone evaluation..."
 
-srun python eval.py \
+srun python $GARF_REPO/eval.py \
     experiment=denoiser_flow_matching \
     data.data_root=input/Fractura/bone_real.hdf5 \
     data.categories="[pig_bone]" \

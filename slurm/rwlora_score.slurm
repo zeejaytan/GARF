@@ -4,7 +4,7 @@
 #SBATCH --time=02:00:00
 #SBATCH --mem=32G
 #SBATCH --cpus-per-task=8
-#SBATCH --output=logs/rwlora/rwscore_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/rwlora/rwscore_%j.out
 
 # Score GARF rough/worn arms on CPU with TORA's own_place (pot-size ruler), for runs whose
 # in-job scoring did not complete. STAMPS = space-separated job IDs of rwlora_arm runs.
@@ -12,7 +12,9 @@
 
 set -euo pipefail
 STAMPS="${STAMPS:?set STAMPS}"
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate
 TORA=/data/gpfs/projects/punim2657/TORA/repo
 for J in $STAMPS; do

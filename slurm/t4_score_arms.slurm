@@ -4,11 +4,13 @@
 #SBATCH --time=00:30:00
 #SBATCH --mem=32G
 #SBATCH --cpus-per-task=4
-#SBATCH --output=t4_score_arms_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/slurm/t4_score_arms_%j.out
 
 # Score the T4 prior-dominance ablation arms with the T0 layout panel.
 set -euo pipefail
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 
 PF=/data/gpfs/projects/punim2657/Puzzlefusion
@@ -19,7 +21,7 @@ OUT=logs/diagnostics/pfpp_t4_${TS}
 
 for MODE in none shuffle random zero; do
     echo "=== scoring t4_${MODE} ==="
-    python scripts/pfpp_layout_probes.py \
+    python $GARF_REPO/scripts/pfpp_layout_probes.py \
         --pfpp-dir "$INF/t4_${MODE}/0" \
         --pc-npz   "$NPZ" \
         --mesh-hdf5 /data/gpfs/projects/punim2657/GARF/input/juglet_deploy.hdf5 --mesh-key artifact/Juglet-000 \

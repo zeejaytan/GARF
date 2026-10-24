@@ -4,7 +4,8 @@
 set -euo pipefail
 
 ROOT="/data/gpfs/projects/punim2657"
-GARF="${ROOT}/GARF"
+GARF="${ROOT}/GARF"            # working area (input/ output/ logs/)
+GARF_REPO="${GARF}/repo"       # the code
 RAW="${ROOT}/Dataset/Juglet"
 CENTERED="${ROOT}/Dataset/Juglet_anchor_centered"
 HDF5_GARF="${GARF}/input/juglet_deploy.hdf5"
@@ -17,12 +18,12 @@ prepare() {
   source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 
   echo "=== Step 1: anchor-center meshes (mandatory for deploy) ==="
-  python preprocess_scan_to_anchor_frame.py \
+  python "${GARF_REPO}/preprocess_scan_to_anchor_frame.py" \
     --input-dir "${RAW}" \
     --output-dir "${CENTERED}"
 
   echo "=== Step 2: HDF5 (GARF + TORA split keys) ==="
-  python create_juglet_hdf5.py \
+  python "${GARF_REPO}/create_juglet_hdf5.py" \
     --input-dir "${CENTERED}" \
     --output "${HDF5_GARF}" \
     --sample-name Juglet-000 \

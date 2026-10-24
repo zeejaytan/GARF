@@ -5,7 +5,7 @@
 #SBATCH --time=04:00:00
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=12
-#SBATCH --output=exp11_wornenc_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/slurm/exp11_wornenc_%j.out
 
 # Exp 11 — remedy for the Exp 10 encoder blindness. Fine-tune GARF's FracSeg
 # feature extractor on labeled synthetic fractures WITH worn-break augmentation
@@ -13,7 +13,9 @@
 # Juglet with the introspection probe: success = Juglet fired% rises toward the
 # fresh-ceramic control's ~3.4% (baseline was 0.57%).
 
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
 export PATH=$CUDA_HOME/bin:$PATH
@@ -25,7 +27,7 @@ OUT=output/frac_seg_worn_${STAMP}
 echo "=== Exp 11 FracSeg worn-break fine-tune ==="; date
 echo "GPU: $(nvidia-smi --query-gpu=name --format=csv,noheader)"
 
-python scripts/finetune_frac_seg.py \
+python $GARF_REPO/scripts/finetune_frac_seg.py \
     --init-ckpt output/feature_extractor.ckpt \
     --data-root input/Fractura/bone_synthetic.hdf5 \
     --categories pig hip leg rib vertebra \
@@ -41,7 +43,7 @@ python scripts/finetune_frac_seg.py \
 
 NEW_CKPT=${OUT}/feature_extractor_worn.ckpt
 echo "=== validating fine-tuned encoder on Juglet (Exp 10 probe) ==="
-python scripts/fracseg_introspection.py \
+python $GARF_REPO/scripts/fracseg_introspection.py \
     --ckpt ${NEW_CKPT} \
     --synth-source input/Fractura/bone_synthetic.hdf5 \
     --synth-objects pig/synthetic_fracture/20/mode_5 \

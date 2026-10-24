@@ -82,13 +82,13 @@ If the fork URL differs, substitute it everywhere below and tell the user the UR
 Inspect first (read-only):
 
 ```bash
-ssh spartan 'cd /data/gpfs/projects/punim2657/GARF && git remote -v && git status -sb && git branch -vv'
+ssh spartan 'cd /data/gpfs/projects/punim2657/GARF/repo && git remote -v && git status -sb && git branch -vv'
 ```
 
 Point `origin` at the fork; keep `upstream` = ai4ce:
 
 ```bash
-ssh spartan 'cd /data/gpfs/projects/punim2657/GARF && \
+ssh spartan 'cd /data/gpfs/projects/punim2657/GARF/repo && \
   (git remote get-url upstream >/dev/null 2>&1 || git remote rename origin upstream) && \
   git remote remove origin 2>/dev/null || true; \
   git remote add origin git@github.com:zeejaytan/GARF.git; \
@@ -101,7 +101,7 @@ If Spartan cannot push to GitHub via SSH, use HTTPS from Spartan or push from th
 Push the branch that contains `docs/local-claude-hpc.md` and `scripts/remote/`:
 
 ```bash
-ssh spartan 'cd /data/gpfs/projects/punim2657/GARF && git push -u origin HEAD'
+ssh spartan 'cd /data/gpfs/projects/punim2657/GARF/repo && git push -u origin HEAD'
 ```
 
 If those files exist only as **uncommitted** changes on Spartan: **ask the user before committing**. Do **not** push to `upstream` / `ai4ce`. Do not force-push unless the user explicitly asks.
@@ -157,7 +157,7 @@ Optional (only if user OK’s submitting a real Slurm job):
 # ./scripts/remote/fetch_artifacts.sh logs ./artifacts/
 ```
 
-Defaults: `SPARTAN_HOST=spartan`, `REMOTE_ROOT=/data/gpfs/projects/punim2657/GARF`.
+Defaults: `SPARTAN_HOST=spartan`, `REMOTE_ROOT=/data/gpfs/projects/punim2657/GARF/repo`.
 
 If `git pull --ff-only` on Spartan fails (diverged history), **stop and report** — do not force-pull.
 

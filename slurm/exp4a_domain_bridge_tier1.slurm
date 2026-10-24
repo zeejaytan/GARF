@@ -5,7 +5,7 @@
 #SBATCH --time=03:30:00
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=8
-#SBATCH --output=exp4a_domain_bridge_tier1_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/slurm/exp4a_domain_bridge_tier1_%j.out
 
 # Exp 4a — domain bridge (Tier 1): morph known-good BB/Fractura objects toward
 # Juglet traits, one factor at a time, measuring REAL GT correctness
@@ -17,9 +17,11 @@
 
 set -euo pipefail
 
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
-export PYTHONPATH="$PWD/scripts:${PYTHONPATH:-}"
+export PYTHONPATH="$GARF_REPO/scripts:${PYTHONPATH:-}"
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
 export PATH=$CUDA_HOME/bin:$PATH
 
@@ -37,7 +39,7 @@ echo "Date: $(date)"; echo "GPU: $(nvidia-smi --query-gpu=name --format=csv,nohe
 
 run_bench () {
     local exp="$1"; local seed="$2"; local hdf5="$3"
-    HYDRA_FULL_ERROR=1 python eval.py \
+    HYDRA_FULL_ERROR=1 python $GARF_REPO/eval.py \
         seed="${seed}" experiment=denoiser_flow_matching experiment_name="${exp}" \
         loggers=csv loggers.csv.save_dir=logs/diagnostics \
         trainer.num_nodes=1 trainer.devices=1 trainer.precision=bf16-mixed \
@@ -56,7 +58,7 @@ build_and_eval () {
     local src="$1"; local source="$2"; local key="$3"; local pieces="$4"; local tf="$5"; local str="$6"; local tag="$7"
     local hdf5="${SUBSETS}/${src}_${tag}.hdf5"
     echo "=== build ${src}_${tag} (transform=${tf} strength=${str}) ==="
-    python scripts/domain_bridge.py --source "$source" --split-key "$key" --pieces "$pieces" \
+    python $GARF_REPO/scripts/domain_bridge.py --source "$source" --split-key "$key" --pieces "$pieces" \
         --transform "$tf" --strength "$str" --seed 0 --out "$hdf5"
     for SEED in 41 42 43; do
         run_bench "${PREFIX}_${src}_${tag}_s${SEED}" "$SEED" "$hdf5"
@@ -81,6 +83,6 @@ sweep_source "bb6"   "$BB_SRC" "everyday" 6
 sweep_source "frpig" "$FR_SRC" "pig"      9
 
 echo "=== aggregate ==="
-python scripts/summarize_bridge_metrics.py --root logs/diagnostics --prefix "$PREFIX" --out "$OUT"
+python $GARF_REPO/scripts/summarize_bridge_metrics.py --root logs/diagnostics --prefix "$PREFIX" --out "$OUT"
 echo "Summary: $OUT/summary.md"
 echo "=== DONE ==="

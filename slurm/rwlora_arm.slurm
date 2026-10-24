@@ -5,7 +5,7 @@
 #SBATCH --time=04:00:00
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=12
-#SBATCH --output=logs/rwlora/rwlora_%x_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/rwlora/rwlora_%x_%j.out
 
 # G1 / .scratch/rough-worn-dose ticket 01: one arm of GARF's rough/worn dose sweep.
 #   ARM=untouched            base GARF, no training
@@ -32,7 +32,9 @@ DRAW_SEEDS="${DRAW_SEEDS:-42}"   # sampling seeds for the 20 attempts
 ADAPTER="${ADAPTER:-}"
 NOISE_SEEDS="${NOISE_SEEDS:-none}"
 ROT_SEEDS="${ROT_SEEDS:-none}"
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
 export PATH=$CUDA_HOME/bin:$PATH
@@ -44,7 +46,7 @@ BASE=output/GARF.ckpt
 
 echo "=== rwlora arm=${ARM} train-seed=${SEED} draw-seeds=${DRAW_SEEDS} noise-seeds=${NOISE_SEEDS} rot-seeds=${ROT_SEEDS} adapter=${ADAPTER:-train} sets=${SETS} draws=${DRAWS} $(date) ==="
 echo "GPU: $(nvidia-smi --query-gpu=name --format=csv,noheader)"
-echo "GARF $(git rev-parse --short HEAD)"
+echo "GARF $(git -C "$GARF_REPO" rev-parse --short HEAD)"
 
 LORA_ARGS=()
 if [ -n "$ADAPTER" ]; then
@@ -60,7 +62,7 @@ elif [ "$ARM" != "untouched" ]; then
         [ -f "$DS/$F.hdf5" ] || { echo "no $DS/$F.hdf5"; exit 1; }
         DATA=(data.data_root=$DS/$F.hdf5 "data.categories=[$F]")
     fi
-    python train.py \
+    python $GARF_REPO/train.py \
         experiment=rough_worn_lora experiment_name="$EXP" seed=$SEED \
         loggers=csv loggers.csv.save_dir=logs/rwlora \
         trainer.num_nodes=1 trainer.devices=1 trainer.precision=bf16-mixed \
@@ -81,7 +83,7 @@ for SET in $SETS; do
     NOISE_ARGS=(); [ "$NS" != none ] && { TAG="${TAG}_ns${NS}"; NOISE_ARGS=("++model.inference_config.noise_seed=$NS"); }
     [ "$RS" != none ] && { TAG="${TAG}_rs${RS}"; NOISE_ARGS+=("++data.rot_seed=$RS"); }
     NAME="rwlora_eval_${ARM}${TAG}_${SET}_${STAMP}"
-    python eval.py \
+    python $GARF_REPO/eval.py \
         seed=$DS_SEED experiment=denoiser_flow_matching experiment_name="$NAME" \
         loggers=csv loggers.csv.save_dir=logs/rwlora \
         trainer.num_nodes=1 trainer.devices=1 trainer.precision=bf16-mixed \
@@ -98,7 +100,7 @@ for SET in $SETS; do
         || { echo "eval $SET failed"; exit 1; }
     RUN=$(dirname "$(ls -d logs/rwlora/$NAME/*/clouds | head -1)")
     echo "--- $SET run dir: $RUN ($(ls $RUN/clouds | wc -l) objects)"
-    python scripts/garf_clouds_reconcile.py "$RUN" --tora $TORA \
+    python $GARF_REPO/scripts/garf_clouds_reconcile.py "$RUN" --tora $TORA \
         || echo "RECONCILE FAILED on $SET -- do not use these scores"
     POTMM=(); [ "$SET" = "juglet_gt" ] && POTMM=(--pot-mm 65)
     python $TORA/scripts/own_place.py --run "$RUN" "${POTMM[@]}" --json "$RUN/own_place.json" \

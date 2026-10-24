@@ -5,16 +5,18 @@
 #SBATCH --time=01:00:00
 #SBATCH --mem=96G
 #SBATCH --cpus-per-task=8
-#SBATCH --output=exp4c_viz_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/slurm/exp4c_viz_%j.out
 
 # Re-run Exp 4c categories with save_assembly=true so GARF exports the assembled
 # GLBs (predicted_assembly.glb + gt) for visual inspection of the thin-wall result.
 
 set -euo pipefail
 
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
-export PYTHONPATH="$PWD/scripts:${PYTHONPATH:-}"
+export PYTHONPATH="$GARF_REPO/scripts:${PYTHONPATH:-}"
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
 export PATH=$CUDA_HOME/bin:$PATH
 
@@ -27,7 +29,7 @@ echo "Date: $(date)"; echo "GPU: $(nvidia-smi --query-gpu=name --format=csv,nohe
 for CAT in ceramics egg bones; do
     EXP="thinviz_${STAMP}_${CAT}"
     echo "=== ${CAT} -> ${EXP} ==="
-    HYDRA_FULL_ERROR=1 python eval.py \
+    HYDRA_FULL_ERROR=1 python $GARF_REPO/eval.py \
         seed=41 experiment=denoiser_flow_matching experiment_name="${EXP}" \
         loggers=csv loggers.csv.save_dir=logs/deploy \
         trainer.num_nodes=1 trainer.devices=1 trainer.precision=bf16-mixed \

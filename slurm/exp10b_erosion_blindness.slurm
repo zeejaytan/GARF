@@ -5,7 +5,7 @@
 #SBATCH --time=01:00:00
 #SBATCH --mem=48G
 #SBATCH --cpus-per-task=8
-#SBATCH --output=exp10b_erode_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/slurm/exp10b_erode_%j.out
 
 # Exp 10b — causal bridge for Exp 10. Erode the TRUE fracture bands of labeled
 # synthetic breaks toward Juglet-like wear (labels preserved) and measure the
@@ -13,7 +13,9 @@
 # Juglet's silent level as erosion grows, wear is the CAUSE of the encoder's
 # blindness -> training on eroded breaks is the justified remedy.
 
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
 export PATH=$CUDA_HOME/bin:$PATH
@@ -25,7 +27,7 @@ echo "=== Exp 10b erosion-blindness sweep ==="; date
 for S in 0.0 0.5 1.0; do
   OUT=logs/diagnostics/exp10b_erode_${STAMP}/s${S}
   echo "---- synth erode strength ${S} -> ${OUT} ----"
-  python scripts/fracseg_introspection.py \
+  python $GARF_REPO/scripts/fracseg_introspection.py \
       --ckpt output/feature_extractor.ckpt \
       --synth-source input/Fractura/bone_synthetic.hdf5 \
       --synth-objects pig/synthetic_fracture/20/mode_5 \

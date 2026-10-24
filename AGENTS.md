@@ -8,12 +8,19 @@ Follow the workspace root **`../AGENTS.md`** (laptop ↔ GitHub ↔ Spartan) for
 |------|--------|
 | GitHub fork (`origin`) | `zeejaytan/GARF` |
 | Upstream | `ai4ce/GARF` |
-| Spartan checkout (`REMOTE_ROOT`) | `/data/gpfs/projects/punim2657/GARF` |
+| Spartan checkout (`REMOTE_ROOT`) | `/data/gpfs/projects/punim2657/GARF/repo` — code only; takes commits from GitHub, never edited |
+| Spartan working area (untracked) | `/data/gpfs/projects/punim2657/GARF/` — `input/`, `output/`, `logs/` (Slurm output in `logs/slurm/`), `runs/`, `attic/`, the `.venv` |
 | SSH | `Host spartan`, user `zhuojiat` |
 | Remote helpers | `scripts/remote/pull_and_sbatch.sh`, `job_status.sh`, `fetch_artifacts.sh` |
 | Setup docs | `docs/local-claude-hpc.md`, `docs/laptop-agent-setup.md` |
 
-Heavy data on Spartan only (gitignored): `input/`, `output/`, `logs`, `*.hdf5` / `*.h5`, checkpoints. Local rsync landing zone: `artifacts/`.
+Heavy data on Spartan only, in the working area: `input/`, `output/`, `logs`, `*.hdf5` / `*.h5`, checkpoints. Local rsync landing zone: `artifacts/`.
+
+**Code and data are split** (ticket `.scratch/workbench-hygiene/issues/01`, 2026-10-24). Every job sets
+`GARF_WORK` (the working area) and `GARF_REPO=$GARF_WORK/repo`, `cd`s to `GARF_WORK` so the
+relative `input/`, `output/` and `logs/` paths keep working, and runs code as
+`python $GARF_REPO/train.py`. `#SBATCH --output` is always absolute. A new job script follows the
+same pattern; never write output into `repo/`.
 
 **Write rules:** new code → `scripts/` (or existing packages); Slurm → `slurm/` or `scripts/`; method notes → `docs/notes/`; fetched samples → `artifacts/` (not source); HPC paths → `CLAUDE.local.md`. Do not add files at the GARF root.
 
@@ -26,7 +33,7 @@ git push origin HEAD
 ./scripts/remote/fetch_artifacts.sh logs/some_run ./artifacts/
 ```
 
-Workbench layout, and the harvest-then-delete procedure that goes with it: `../docs/agents/workspace-hygiene.md`. Deletion follows `../AGENTS.md` rule 13. Canonical checkout `/data/gpfs/projects/punim2657/GARF`; its `runs/` + `attic/` are not yet set up.
+Workbench layout, and the harvest-then-delete procedure that goes with it: `../docs/agents/workspace-hygiene.md`. Deletion follows `../AGENTS.md` rule 13. Canonical checkout `/data/gpfs/projects/punim2657/GARF/repo`, working area `/data/gpfs/projects/punim2657/GARF/` with `runs/` + `attic/`.
 
 ## Domain / debugging
 

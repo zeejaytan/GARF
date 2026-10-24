@@ -5,7 +5,7 @@
 #SBATCH --time=03:00:00
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=8
-#SBATCH --output=exp8_rim_oversample_remedy_%j.out
+#SBATCH --output=/data/gpfs/projects/punim2657/GARF/logs/slurm/exp8_rim_oversample_remedy_%j.out
 
 # Exp 8 — FRACTURE-RIM OVERSAMPLING REMEDY test (Juglet root cause fix,
 # per JUGLET_ROOTCAUSE_FINDINGS.md).
@@ -24,7 +24,9 @@
 
 set -euo pipefail
 
-cd /data/gpfs/projects/punim2657/GARF
+GARF_WORK=/data/gpfs/projects/punim2657/GARF        # working area: input/ output/ logs/ (data, untracked)
+GARF_REPO=$GARF_WORK/repo   # the code: fetch-only checkout of zeejaytan/GARF
+cd "$GARF_WORK"
 source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate  # shared env (GARF+CRAG, 2026-09-18)
 
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
@@ -46,7 +48,7 @@ echo "GPU: $(nvidia-smi --query-gpu=name --format=csv,noheader)"
 
 run_eval () {  # NAME DATA_ROOT CATEGORIES SEED FRAC
     local NAME=$1 DATA_ROOT=$2 CATS=$3 SEED=$4 FRAC=$5
-    HYDRA_FULL_ERROR=1 python eval.py \
+    HYDRA_FULL_ERROR=1 python $GARF_REPO/eval.py \
         seed="${SEED}" \
         experiment=denoiser_flow_matching \
         experiment_name="${NAME}" \
@@ -85,7 +87,7 @@ for FT in "0.35 035" "0.60 060"; do
         RUN_DIRS+=("logs/deploy/${NAME}")
     done
     CHAMFER_OUT="${OUT_ROOT}/juglet_chamfer_f${TAG}"
-    python scripts/pair_reference_chamfer.py juglet \
+    python $GARF_REPO/scripts/pair_reference_chamfer.py juglet \
         --run-dirs "${RUN_DIRS[@]}" \
         --pairs-hdf5 "$JUGLET_PAIRS" \
         --adjacency logs/diagnostics/juglet_adjacency/adjacency.json \
@@ -104,7 +106,7 @@ for SEED in 41 42 43; do
     RUN_DIRS+=("logs/deploy/${NAME}")
 done
 CHAMFER_OUT="${OUT_ROOT}/control_chamfer_f035"
-python scripts/pair_reference_chamfer.py control \
+python $GARF_REPO/scripts/pair_reference_chamfer.py control \
     --run-dirs "${RUN_DIRS[@]}" \
     --pairs-hdf5 "$CONTROL_PAIRS" \
     --adjacency logs/diagnostics/control_ceramics_adjacency.json \
@@ -122,7 +124,7 @@ done
 
 echo ""
 echo "=== Exp 8 remedy summary ==="
-python scripts/summarize_rim_remedy.py \
+python $GARF_REPO/scripts/summarize_rim_remedy.py \
     "${SUMMARY_ARGS[@]}" \
     --out "$OUT_ROOT"
 
