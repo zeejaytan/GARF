@@ -22,6 +22,9 @@
 # them tied to the draw seed as before.
 # ROT_SEEDS="1 2 3" re-draws only each sherd's random input turn, points kept as the draw
 # seed sampled them (ticket 07); "none" (default) leaves the turns tied to the draw seed.
+# DS=<dir> reads the HDF5 sets from that directory instead of TORA/dataset, so a set kept
+# elsewhere (e.g. a CSC wear-copies run's out/, pr-workspace wear-beyond-juglet 05) is never
+# copied or linked in.
 
 set -euo pipefail
 ARM="${ARM:?set ARM}"
@@ -39,12 +42,12 @@ source /data/gpfs/projects/punim2657/CRAG/.venv/bin/activate
 export CUDA_HOME=/apps/easybuild-2022/easybuild/software/Core/CUDA/12.5.1
 export PATH=$CUDA_HOME/bin:$PATH
 export HYDRA_FULL_ERROR=1
-DS=/data/gpfs/projects/punim2657/TORA/dataset
+DS="${DS:-/data/gpfs/projects/punim2657/TORA/dataset}"
 TORA=/data/gpfs/projects/punim2657/TORA/repo
 STAMP="${SLURM_JOB_ID:-local}"
 BASE=output/GARF.ckpt
 
-echo "=== rwlora arm=${ARM} train-seed=${SEED} draw-seeds=${DRAW_SEEDS} noise-seeds=${NOISE_SEEDS} rot-seeds=${ROT_SEEDS} adapter=${ADAPTER:-train} sets=${SETS} draws=${DRAWS} $(date) ==="
+echo "=== rwlora arm=${ARM} train-seed=${SEED} draw-seeds=${DRAW_SEEDS} noise-seeds=${NOISE_SEEDS} rot-seeds=${ROT_SEEDS} adapter=${ADAPTER:-train} sets=${SETS} draws=${DRAWS} ds=${DS} $(date) ==="
 echo "GPU: $(nvidia-smi --query-gpu=name --format=csv,noheader)"
 echo "GARF $(git -C "$GARF_REPO" rev-parse --short HEAD)"
 
