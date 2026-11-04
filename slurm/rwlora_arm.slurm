@@ -24,7 +24,8 @@
 # seed sampled them (ticket 07); "none" (default) leaves the turns tied to the draw seed.
 # DS=<dir> reads the HDF5 sets from that directory instead of TORA/dataset, so a set kept
 # elsewhere (e.g. a CSC wear-copies run's out/, pr-workspace wear-beyond-juglet 05) is never
-# copied or linked in.
+# copied or linked in. A SETS entry given as an absolute path without .hdf5 (/dir/name) is
+# read from that directory instead, so one job can take sets from more than one run.
 
 set -euo pipefail
 ARM="${ARM:?set ARM}"
@@ -82,6 +83,9 @@ for DS_SEED in $DRAW_SEEDS; do
 for NS in $NOISE_SEEDS; do
 for RS in $ROT_SEEDS; do
 for SET in $SETS; do
+    # an absolute entry (/dir/name) reads /dir/name.hdf5 instead of $DS/name.hdf5, so one job
+    # can take sets from two runs (pr-workspace wear-beyond-juglet 09)
+    SETDIR=$DS; case "$SET" in /*) SETDIR=$(dirname "$SET"); SET=$(basename "$SET");; esac
     TAG=""; [ "$DS_SEED" != 42 ] && TAG="_ds${DS_SEED}"
     NOISE_ARGS=(); [ "$NS" != none ] && { TAG="${TAG}_ns${NS}"; NOISE_ARGS=("++model.inference_config.noise_seed=$NS"); }
     [ "$RS" != none ] && { TAG="${TAG}_rs${RS}"; NOISE_ARGS+=("++data.rot_seed=$RS"); }
@@ -90,7 +94,7 @@ for SET in $SETS; do
         seed=$DS_SEED experiment=denoiser_flow_matching experiment_name="$NAME" \
         loggers=csv loggers.csv.save_dir=logs/rwlora \
         trainer.num_nodes=1 trainer.devices=1 trainer.precision=bf16-mixed \
-        data.data_root=$DS/$SET.hdf5 "data.categories=['$SET']" \
+        data.data_root=$SETDIR/$SET.hdf5 "data.categories=['$SET']" \
         data.min_parts=2 data.max_parts=20 data.batch_size=1 data.num_workers=4 \
         data.multi_ref=False \
         model.feature_extractor_ckpt=null \
