@@ -21,6 +21,7 @@ meshes_max_scale = 1); the script prints pot_mm against the truth's longest side
 import argparse
 import csv
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -130,7 +131,8 @@ def main() -> int:
     if not data:
         print(f"no clouds in {a.run}")
         return 1
-    cond = next(iter(data.values()))[0]["name"].item().split("/")[0].replace("csc_whole_", "")
+    # set name -> copies.csv condition: csc_whole_worn -> worn, csc_whole20_worn4 -> worn4
+    cond = re.sub(r"^csc_whole\d*_", "", next(iter(data.values()))[0]["name"].item().split("/")[0])
     meta = {(r["card"], r["condition"]): r for r in csv.DictReader(open(a.copies))}
     cards = sorted(data) if a.cards == ["all"] else a.cards
     pictures = a.cards != ["all"]
