@@ -18,6 +18,7 @@ Next: the three queued tickets: stronger rough/worn training, and ten presentati
 Viewer: `garf_juglet_genuine_t06` (a full reassembly) beside `garf_juglet_spun_t06` (one sherd spun in place)
 
 Beyond the Juglet (pr-workspace U3, 2026-11-06): on 21 CSC catalogue pots at 6-10 sherds, released GARF seats every sherd on 7-8 of 11 counted pots on every attempt, so the rough/worn adapters can only tie there. That is a ceiling, not a result. rough 1x gives the fewest full reassemblies in every condition. Round 2 (10-20 sherds) is the real test; read-out `pr-workspace/.scratch/wear-beyond-juglet/readout-round1.md`.
+Round 2 (2026-11-06, 18 pots at 10-20 sherds): the worn 4x adapter beat clean-break on 4 of 9 counted pots on worn breaks (bar 7; chance of 4+ about 5%), 1562 against 1336 full reassemblies of 3,600, and won nowhere on clean or coarse-v3, where it seats 5-6% fewer. It learned the tool's breaks, not a general lesson. Read-out `pr-workspace/.scratch/wear-beyond-juglet/readout-round2.md`.
 
 ## Why it matters
 
