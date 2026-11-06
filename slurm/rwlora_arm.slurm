@@ -26,6 +26,8 @@
 # elsewhere (e.g. a CSC wear-copies run's out/, pr-workspace wear-beyond-juglet 05) is never
 # copied or linked in. A SETS entry given as an absolute path without .hdf5 (/dir/name) is
 # read from that directory instead, so one job can take sets from more than one run.
+# POTSIZE=<copies.csv> scores against each WHOLE pot's size (own_place --pot-size), for sets
+# with sherds missing (pr-workspace wear-beyond-juglet 13); unset = the box of the sherds given.
 
 set -euo pipefail
 ARM="${ARM:?set ARM}"
@@ -48,7 +50,7 @@ TORA=/data/gpfs/projects/punim2657/TORA/repo
 STAMP="${SLURM_JOB_ID:-local}"
 BASE=output/GARF.ckpt
 
-echo "=== rwlora arm=${ARM} train-seed=${SEED} draw-seeds=${DRAW_SEEDS} noise-seeds=${NOISE_SEEDS} rot-seeds=${ROT_SEEDS} adapter=${ADAPTER:-train} sets=${SETS} draws=${DRAWS} ds=${DS} $(date) ==="
+echo "=== rwlora arm=${ARM} pot-size=${POTSIZE:-box} train-seed=${SEED} draw-seeds=${DRAW_SEEDS} noise-seeds=${NOISE_SEEDS} rot-seeds=${ROT_SEEDS} adapter=${ADAPTER:-train} sets=${SETS} draws=${DRAWS} ds=${DS} $(date) ==="
 echo "GPU: $(nvidia-smi --query-gpu=name --format=csv,noheader)"
 echo "GARF $(git -C "$GARF_REPO" rev-parse --short HEAD)"
 
@@ -110,6 +112,7 @@ for SET in $SETS; do
     python $GARF_REPO/scripts/garf_clouds_reconcile.py "$RUN" --tora $TORA \
         || echo "RECONCILE FAILED on $SET -- do not use these scores"
     POTMM=(); [ "$SET" = "juglet_gt" ] && POTMM=(--pot-mm 65)
+    [ -n "${POTSIZE:-}" ] && POTMM+=(--pot-size "$POTSIZE")
     python $TORA/scripts/own_place.py --run "$RUN" "${POTMM[@]}" --json "$RUN/own_place.json" \
         || echo "own_place failed on $SET (clouds kept; score on CPU)"
 done
