@@ -19,6 +19,7 @@ Viewer: `garf_juglet_genuine_t06` (a full reassembly) beside `garf_juglet_spun_t
 
 Beyond the Juglet (pr-workspace U3, 2026-11-06): on 21 CSC catalogue pots at 6-10 sherds, released GARF seats every sherd on 7-8 of 11 counted pots on every attempt, so the rough/worn adapters can only tie there. That is a ceiling, not a result. rough 1x gives the fewest full reassemblies in every condition. Round 2 (10-20 sherds) is the real test; read-out `pr-workspace/.scratch/wear-beyond-juglet/readout-round1.md`.
 Round 2 (2026-11-06, 18 pots at 10-20 sherds): the worn 4x adapter beat clean-break on 4 of 9 counted pots on worn breaks (bar 7; chance of 4+ about 5%), 1562 against 1336 full reassemblies of 3,600, and won nowhere on clean or coarse-v3, where it seats 5-6% fewer. It learned the tool's breaks, not a general lesson. Read-out `pr-workspace/.scratch/wear-beyond-juglet/readout-round2.md`.
+Round 3 (2026-11-07, the same 18 pots with 20% of sherds removed by GARF's own rule): the worn 4x adapter beat clean-break on 6 of 9 counted worn pots and lost 1 (bar 7: does not hold; chance of 6+ about 1 in 750, a strong lead), 860 against 626 full reassemblies of 3,600 on the worn set, mostly from one pot (p390). On clean breaks 3 of 7 (bar 5), no cost in full pots. rough 1x does not hold and loses 4 of 7 clean pots. Read-out `pr-workspace/.scratch/wear-beyond-juglet/readout-round3.md`.
 
 ## Why it matters
 
