@@ -15,6 +15,26 @@ and then puts the block in the wrong place against the anchor sherd (tora juglet
 
 Weight: one pot; two successes are too few to say what makes them succeed.
 Next: the three queued tickets: stronger rough/worn training, and ten presentations across four trained models.
+**The overlap in the reference is a scan flaw, and it is too small to decide the score
+(2026-11-08, pr-workspace U20 ticket 08).** Where sherds 0 and 7 meet, a 1.5 mm tip of sherd 0
+sits up to 1 mm inside sherd 7's wall. The conservator looked at it in the viewer and ruled it
+an imperfection from the scanning. Leaving that spot aside, the Juglet re-seats with no sherd
+inside another by more than one scan spacing, and it takes only small moves: no sherd moves
+more than 0.73 mm or turns more than 1.8 deg (`juglet_gt_snug`, job 34517825). The September
+5-11 deg turns of sherds 2 and 7 came from that one spot.
+The conservator asked (2026-11-08) whether this overlap is why rough training worked here: a
+model that will not put one sherd inside another could never reach a reference that has one.
+The record points against it, though it has not been tested directly:
+- the right-way-round gate is 4.6 mm from home, six times the largest re-seat move;
+- the arms differ on body sherds 4, 5 and 6, and none of them touches sherd 0;
+- the five-skeptic refute above already found that the reference's faults do not decide which
+  sherds the arms gain.
+GARF also has no explicit no-overlap rule; any such preference would have been learned. The
+direct test is to re-score the saved attempts against `juglet_gt_snug` and see whether any
+count changes.
+Which of the three: the reference is slightly wrong at one spot, which is a scan flaw, not the
+method. Weight: one pot.
+
 Viewer: `garf_juglet_genuine_t06` (a full reassembly) beside `garf_juglet_spun_t06` (one sherd spun in place)
 
 Beyond the Juglet (pr-workspace U3, 2026-11-06): on 21 CSC catalogue pots at 6-10 sherds, released GARF seats every sherd on 7-8 of 11 counted pots on every attempt, so the rough/worn adapters can only tie there. That is a ceiling, not a result. rough 1x gives the fewest full reassemblies in every condition. Round 2 (10-20 sherds) is the real test; read-out `pr-workspace/.scratch/wear-beyond-juglet/readout-round1.md`.
