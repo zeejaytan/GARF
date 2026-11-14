@@ -133,7 +133,14 @@ def main() -> int:
         return 1
     # set name -> copies.csv condition: csc_whole_worn -> worn, csc_whole20_worn4 -> worn4
     cond = re.sub(r"^csc_whole\d*(?:miss)?_", "", next(iter(data.values()))[0]["name"].item().split("/")[0])
-    meta = {(r["card"], r["condition"]): r for r in csv.DictReader(open(a.copies))}
+    rows_csv = list(csv.DictReader(open(a.copies)))
+    if rows_csv and "condition" in rows_csv[0]:
+        meta = {(r["card"], r["condition"]): r for r in rows_csv}
+    else:
+        # one setting per copies.csv (e.g. the uneven copies, column `setting`): key by card alone
+        if len({r["card"] for r in rows_csv}) != len(rows_csv):
+            print(f"{a.copies}: no condition column and a card appears twice"); return 1
+        meta = {(r["card"], cond): r for r in rows_csv}
     cards = sorted(data) if a.cards == ["all"] else a.cards
     pictures = a.cards != ["all"]
     summary = []
